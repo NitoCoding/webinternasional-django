@@ -1,0 +1,81 @@
+{% load website_tags %}
+<a href="{% url 'website:degree_detail' it.pk %}" class="group" data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter 1 100 %}">
+    <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-bluePrimary">
+        <!-- Header with Image/Flag and Type Badge -->
+        <div class="relative">
+            {% if it.image %}
+                <div class="h-40 overflow-hidden">
+                    <img src="{{ it.image.url }}"
+                         alt="{{ it.partner_university }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center text-xl">
+                            {{ it.flag_emoji|default:"🌍" }}
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-lg">{{ it.partner_university }}</h3>
+                            <p class="text-white/80 text-sm">{{ it.country }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="bg-gradient-to-r from-bluePrimary to-blueSecondary p-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl shadow-inner">
+                            {{ it.flag_emoji|default:"🌍" }}
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-lg">{{ it.partner_university }}</h3>
+                            <p class="text-white/80 text-sm">{{ it.country }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- Degree Type Badge -->
+            <div class="absolute top-4 right-4">
+                <span class="px-3 py-1 rounded-full text-xs font-bold {% if it.partnership_type == 'double_degree' %}bg-yellow-400 text-yellow-900{% else %}bg-green-400 text-green-900{% endif %}">
+                    {{ it.get_partnership_type_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-5">
+            <!-- Programs -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="bg-red-50 rounded-lg p-3">
+                    <p class="text-xs text-red-600 font-semibold mb-1">Hasanuddin University</p>
+                    <p class="text-gray-800 text-sm font-medium">{{ it.unhas_program }}</p>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-3">
+                    <p class="text-xs text-blue-600 font-semibold mb-1">{{ it.partner_university|str_limit:20 }}</p>
+                    <p class="text-gray-800 text-sm font-medium">{{ it.partner_program }}</p>
+                </div>
+            </div>
+
+            <!-- Duration -->
+            {% if it.duration %}
+                <div class="flex items-center gap-2 text-gray-600 text-sm mb-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{{ it.duration }}</span>
+                </div>
+            {% endif %}
+
+            <!-- View Details Button -->
+            <div class="flex justify-end mt-4">
+                <span class="text-bluePrimary font-semibold text-sm group-hover:underline flex items-center gap-1">
+                    View Details
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </span>
+            </div>
+        </div>
+    </div>
+</a>

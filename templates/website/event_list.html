@@ -1,22 +1,124 @@
 {% extends "base.html" %}
-{% block title %}Event - International Class{% endblock %}
+{% load website_tags %}
+{% block title %}Events - Hasanuddin University{% endblock %}
 {% block hero %}{% include "partials/hero.html" with title=title description=description %}{% endblock %}
 {% block content %}
-<section class="container mx-auto px-6 py-16 grid gap-6 md:grid-cols-2">
-  {% for e in page %}
-  <a href="{% url 'website:event_detail' e.pk %}" class="flex gap-5 bg-white rounded-2xl shadow-lg p-5 hover:shadow-xl transition">
-    <div class="text-center bg-redPrimary text-white rounded-xl px-4 py-3 min-w-[5rem]">
-      <div class="text-3xl font-bold">{{ e.event_date|date:"d" }}</div>
-      <div class="text-sm">{{ e.event_date|date:"M Y" }}</div>
-    </div>
-    <div>
-      <h2 class="text-xl font-bold text-gray-800">{{ e.title }}</h2>
-      <p class="text-gray-600 mt-2">{{ e.content|truncatechars:160 }}</p>
-    </div>
-  </a>
-  {% empty %}
-  <p class="text-gray-500">No events yet.</p>
-  {% endfor %}
-  <div class="md:col-span-2">{% include "partials/pagination.html" with page=page %}</div>
-</section>
+    <!-- Hero Section -->
+    <section class="relative py-20 bg-gradient-to-br from-bluePrimary via-blueSecondary to-blueThird overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 right-10 w-72 h-72 bg-white rounded-full filter blur-3xl"></div>
+            <div class="absolute bottom-10 left-10 w-96 h-96 bg-white rounded-full filter blur-3xl"></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center" data-aos="fade-up">
+                <span class="text-white font-semibold text-sm uppercase tracking-wider mb-4 block">Upcoming Events</span>
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                    Latest <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-400">Events</span>
+                </h1>
+                <p class="text-xl text-white/90 max-w-2xl mx-auto">
+                    Join us for exciting events and activities at International Class Program
+                </p>
+                <div class="mt-8 flex justify-center">
+                    <div class="w-32 h-1 bg-gradient-to-r from-yellow-300 to-yellow-400 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Content Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-12 justify-center">
+                <!-- Main Events -->
+                <div class="w-full lg:w-[45%]">
+                    {% for event_item in page %}
+                        <article
+                            class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden mb-6"
+                            data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 100 %}">
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <time datetime="{{ event_item.event_date|date:'Y-m-d' }}"
+                                        class="text-xs font-semibold text-bluePrimary bg-bluePrimary/10 px-3 py-1 rounded-full">
+                                        {{ event_item.event_date|date:"M d, Y" }}
+                                    </time>
+                                    <span class="text-xs text-gray-500">• Upcoming</span>
+                                </div>
+
+                                <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-bluePrimary transition-colors">
+                                    <a href="{% url 'website:event_detail' event_item.pk %}">
+                                        {{ event_item.title }}
+                                    </a>
+                                </h2>
+
+                                <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                                    {{ event_item.content|striptags|str_limit:150 }}
+                                </p>
+
+                                <a href="{% url 'website:event_detail' event_item.pk %}"
+                                    class="inline-flex items-center text-bluePrimary font-medium text-sm hover:translate-x-1 transition-transform">
+                                    Read More
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <p class="text-gray-500">No events yet.</p>
+                    {% endfor %}
+
+                    <!-- Pagination -->
+                    {% if page.paginator.num_pages > 1 %}
+                        <div class="flex justify-center mt-8">
+                            {% include "partials/pagination.html" with page=page %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="w-full lg:w-[35%]">
+                    <!-- Upcoming Events -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6" data-aos="fade-left">
+                        <div class="flex items-center mb-4">
+                            <div
+                                class="w-10 h-10 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-lg flex items-center justify-center mr-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">Upcoming Events</h3>
+                        </div>
+
+                        <div class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                            {% for upcoming_item in upcoming %}
+                                <a href="{% url 'website:event_detail' upcoming_item.pk %}"
+                                    class="group flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gradient-to-br hover:from-bluePrimary/5 hover:to-blueSecondary/5 hover:shadow-md transition-all duration-300">
+                                    <div
+                                        class="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-xl flex flex-col items-center justify-center text-center shadow-md group-hover:scale-110 transition-transform">
+                                        <span class="text-lg font-bold text-white">{{ upcoming_item.event_date|date:"d" }}</span>
+                                        <span class="text-xs text-white/90 uppercase font-medium">{{ upcoming_item.event_date|date:"M" }}</span>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <time datetime="{{ upcoming_item.event_date|date:'Y-m-d' }}"
+                                            class="text-xs font-semibold text-bluePrimary mb-1 block">
+                                            {{ upcoming_item.event_date|date:"M d, Y" }}
+                                        </time>
+                                        <h4 class="text-sm font-bold text-gray-900 group-hover:text-bluePrimary transition-colors line-clamp-2 mb-1">
+                                            {{ upcoming_item.title|str_limit:60 }}
+                                        </h4>
+                                        <p class="text-xs text-gray-600 line-clamp-1">
+                                            {{ upcoming_item.content|striptags|str_limit:70 }}
+                                        </p>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
 {% endblock %}

@@ -3,12 +3,196 @@
 {% block title %}About - International Class{% endblock %}
 {% block hero %}{% include "partials/hero.html" with title=title description=description %}{% endblock %}
 {% block content %}
-<section class="container mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-  <img src="{{ settings.about_image_url }}" alt="About" class="rounded-2xl shadow-lg w-full object-cover">
-  <div class="space-y-4">
-    <h2 class="text-3xl font-bold text-redPrimary">{{ settings.about_title }}</h2>
-    <p class="text-gray-600 leading-relaxed">{{ settings.about_paragraph_1 }}</p>
-    <p class="text-gray-600 leading-relaxed">{{ settings.about_paragraph_2 }}</p>
-  </div>
-</section>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16 md:py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center" data-aos="fade-up">
+                <h1 class="text-3xl md:text-5xl font-light mb-4">
+                    Hasanuddin University
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-semibold">
+                    International Class
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <p class="text-gray-600 text-center leading-relaxed text-lg" data-aos="fade-up">
+                A modern, innovative, inclusive, multicultural, and globally-oriented campus that covers various fields of
+                study.
+                With a commitment to producing graduates with high competitiveness in the international arena, UNHAS
+                continues
+                to strengthen its position as one of the leading educational centers in Southeast Asia and the world.
+            </p>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-light text-gray-900 mb-8 text-center" data-aos="fade-up">
+                    Our History
+                </h2>
+                <p class="text-gray-600 text-lg leading-relaxed mb-12" data-aos="fade-up" data-aos-delay="100">
+                    Established in 2006, the Hasanuddin University International Class was launched as part of UNHAS's
+                    vision
+                    to become a world-class university. The program aims to meet the increasing demand for high-quality
+                    education
+                    that can compete internationally and facilitate academic mobility for both local and foreign students,
+                    contributing to the development of science and technology at the global level.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Vision -->
+                    <div class="bg-white p-8 rounded-lg shadow-sm" data-aos="fade-right" data-aos-delay="200">
+                        <h3 class="text-2xl font-light text-gray-900 mb-4 pb-4 border-b border-gray-200">
+                            Vision
+                        </h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            To become a center of excellence in international education, producing competent graduates who
+                            are ready to compete in the global market, while leveraging the potential of the Indonesian
+                            Maritime
+                            Continent.
+                        </p>
+                    </div>
+
+                    <!-- Mission -->
+                    <div class="bg-white p-8 rounded-lg shadow-sm" data-aos="fade-left" data-aos-delay="300">
+                        <h3 class="text-2xl font-light text-gray-900 mb-4 pb-4 border-b border-gray-200">
+                            Mission
+                        </h3>
+                        <ul class="space-y-3 text-gray-600">
+                            <li class="flex items-start">
+                                <span class="text-blue-600 mr-3">•</span>
+                                <span>To provide a learning environment based on foreign languages that enhances the
+                                    capacity
+                                    of innovative, adaptive, and globally-oriented learners.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-600 mr-3">•</span>
+                                <span>To establish international collaborations with universities and global institutions to
+                                    expand students' perspectives and experiences.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-blue-600 mr-3">•</span>
+                                <span>To foster the development of knowledge, skills, and expertise in students, supporting
+                                    global progress with a focus on the Indonesian Maritime Continent as a hub of innovation
+                                    and
+                                    international education.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Facilities Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-light text-gray-900 mb-4 text-center" data-aos="fade-up">
+                    Our Facilities
+                </h2>
+                <p class="text-gray-600 text-center mb-12 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+                    The International Class at Hasanuddin University offers cutting-edge facilities designed to enhance
+                    the academic experience, promote collaboration, and foster excellence in education.
+                </p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <!-- Laboratory -->
+                    <div class="text-center p-6 group" data-aos="zoom-in" data-aos-delay="200">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <svg class="w-8 h-8 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Laboratories</h3>
+                        <p class="text-sm text-gray-600">State-of-the-art laboratories for learning and research</p>
+                    </div>
+
+                    <!-- Library -->
+                    <div class="text-center p-6 group" data-aos="zoom-in" data-aos-delay="300">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <svg class="w-8 h-8 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Library</h3>
+                        <p class="text-sm text-gray-600">Extensive resources for academic enrichment</p>
+                    </div>
+
+                    <!-- Seminar Room -->
+                    <div class="text-center p-6 group" data-aos="zoom-in" data-aos-delay="400">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <svg class="w-8 h-8 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Seminar Room</h3>
+                        <p class="text-sm text-gray-600">Spaces for seminars and workshops</p>
+                    </div>
+
+                    <!-- Faculty Room -->
+                    <div class="text-center p-6 group" data-aos="zoom-in" data-aos-delay="500">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <svg class="w-8 h-8 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 13.255A12.018 12.018 0 018 20.97V21h6v-1.03c5.024-.27 9-3.38 9-7.715z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v4m0 0l2-2m-2 2l-2-2" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Faculty Room</h3>
+                        <p class="text-sm text-gray-600">Collaborative workspaces</p>
+                    </div>
+
+                    <!-- International Classrooms -->
+                    <div class="text-center p-6 group" data-aos="zoom-in" data-aos-delay="600">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <svg class="w-8 h-8 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">International Classrooms</h3>
+                        <p class="text-sm text-gray-600">Modern learning environments</p>
+                    </div>
+
+                    <!-- Evacuation Routes -->
+                    <div class="text-center p-6 group" data-aos="zoom-in" data-aos-delay="700">
+                        <div
+                            class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                            <svg class="w-8 h-8 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">Evacuation Routes</h3>
+                        <p class="text-sm text-gray-600">Emergency preparedness routes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 {% endblock %}

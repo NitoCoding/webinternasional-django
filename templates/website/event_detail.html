@@ -1,11 +1,75 @@
 {% extends "base.html" %}
-{% block title %}{{ item.title }} - Event{% endblock %}
+{% load website_tags %}
+{% block title %}Event - {{ item.title }}{% endblock %}
+{% block hero %}{% include "partials/hero.html" with title=title description=description %}{% endblock %}
 {% block content %}
-<article class="container mx-auto px-6 py-12 max-w-4xl">
-  <a href="{% url 'website:event_list' %}" class="text-redPrimary hover:underline">&larr; Back to Events</a>
-  <p class="text-sm text-gray-500 mt-6">Event date: {{ item.event_date|date:"d F Y, H:i" }}</p>
-  <h1 class="text-4xl font-bold text-gray-800 mt-2">{{ item.title }}</h1>
-  {% if item.image %}<img src="{{ item.image.url }}" alt="" class="w-full rounded-2xl shadow-lg my-8">{% endif %}
-  <div class="text-gray-700 leading-relaxed whitespace-pre-line">{{ item.content }}</div>
-</article>
+    <!-- Blue Navigation Bar -->
+    <div class="bg-gradient-to-r from-bluePrimary to-blueSecondary py-4 sticky top-0 z-40 shadow-md">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <!-- Logo/Text -->
+                    <div class="text-white">
+                        <h1 class="text-2xl font-bold">International Class Program</h1>
+                        <p class="text-blue-100 text-sm">Hasanuddin University</p>
+                    </div>
+                </div>
+
+                <!-- Back to Events Button -->
+                <a href="{% url 'website:event_list' %}"
+                    class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/30 transition-all duration-200 border border-white/30">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Events
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Article Content -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <article class="bg-white rounded-2xl shadow-xl overflow-hidden" data-aos="fade-up">
+                    <!-- Featured Image -->
+                    {% if item.image %}
+                        <div class="relative w-full aspect-[16/9] overflow-hidden">
+                            <img loading="lazy" src="{{ item.image.url }}"
+                                alt="Featured Image for {{ item.title }}" class="w-full h-full object-cover" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Article Body -->
+                    <div class="p-8 md:p-12">
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight">
+                            {{ item.title }}
+                        </h1>
+
+                        <!-- Event Date -->
+                        <div class="flex items-center gap-3 mb-8">
+                            <div
+                                class="w-12 h-12 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-lg flex items-center justify-center mr-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Event Date</p>
+                                <p class="text-sm text-gray-500">{{ item.event_date|date:"F d, Y" }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Article Content -->
+                        <div class="prose prose-lg max-w-none">
+                            <div class="text-lg leading-relaxed text-gray-800">
+                                {{ item.content|linebreaksbr }}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
 {% endblock %}

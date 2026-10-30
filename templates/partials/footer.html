@@ -1,39 +1,53 @@
 {% load static %}
-<footer class="bg-bluePrimary text-white relative overflow-hidden">
-  <div class="absolute inset-0 z-0 opacity-10">
-    <img src="{% static 'images/logoUnhasWhite.png' %}" alt="" class="max-h-full">
-  </div>
+<!-- resources/views/partials/footer.blade.php -->
 
-  <div class="container mx-auto relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start px-12 py-12 pb-16">
-    <div class="space-y-4">
-      <div class="flex items-center gap-4">
-        <img src="{% static 'images/logoUnhas.png' %}" alt="Logo" class="w-14">
-        <div class="w-px h-16 bg-white"></div>
-        <span class="font-bold text-2xl">Hasanuddin <br> University</span>
-      </div>
-      <p>{{ footer.footer_address }}</p>
-      <p>Phone: {{ footer.footer_phone }}</p>
-      <p>Email: {{ footer.footer_email }}</p>
+
+<footer class="bg-bluePrimary text-white relative overflow-hidden">
+    <!-- Background Logo -->
+    <div class="absolute inset-0 z-0 opacity-10">
+        <img src="{% static 'images/logoUnhasWhite.png' %}" alt="Logo Unhas" class="max-h-full">
     </div>
 
-    <nav class="space-y-4">
-      <h3 class="font-semibold text-lg">Pages</h3>
-      <a href="{% url 'website:about' %}" class="block hover:text-gray-300">About</a>
-      <a href="{% url 'website:study_program_list' %}" class="block hover:text-gray-300">Study Program</a>
-      <a href="{% url 'website:ie_list' %}" class="block hover:text-gray-300">IE Program</a>
-      <a href="{% url 'website:news_list' %}" class="block hover:text-gray-300">News</a>
-      <a href="{% url 'website:event_list' %}" class="block hover:text-gray-300">Event</a>
-    </nav>
+    <!-- Main Footer Content -->
+    <div class="container mx-auto relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start px-12 py-12 pb-16">
+        <!-- University Info with Logo -->
+        <div class="space-y-4 pe-2">
+            <div class="flex items-center gap-4">
+                <img src="{% static 'images/logoUnhas.png' %}" alt="Logo" class="w-14">
+                <div class="w-px h-16 bg-white"></div>
+                <span class="font-bold text-2xl">Hasanuddin <br> University</span>
+            </div>
+            <p>{{ footer.footer_address }}</p>
+            <p>Phone: {{ footer.footer_phone }}</p>
+            <p>Email: {{ footer.footer_email }}</p>
+        </div>
 
-    <nav class="space-y-4">
-      <h3 class="font-semibold text-lg">Quick Links</h3>
-      <a href="https://neosia.unhas.ac.id/login" class="block hover:text-gray-300">Student Portal</a>
-      <a href="https://journal.unhas.ac.id/" class="block hover:text-gray-300">Jurnal</a>
-      <a href="https://sikola-v2.unhas.ac.id/login/index.php" class="block hover:text-gray-300">Sikola</a>
-    </nav>
-  </div>
+        <!-- Navigation Links -->
+        <nav class="space-y-8 px-8">
+            <h3 class="font-semibold text-lg">Pages</h3>
+            <a href="{% url 'website:about' %}" class="hover:text-gray-300 block pt-4">About</a>
+            <a href="{% url 'website:study_program_list' %}" class="hover:text-gray-300 block">Study Program</a>
+            <a href="{% url 'website:ie_list' %}" class="hover:text-gray-300 block">IE Program</a>
+            <a href="{% url 'website:news_list' %}" class="hover:text-gray-300 block">News</a>
+            <a href="{% url 'website:event_list' %}" class="hover:text-gray-300 block">Event</a>
+        </nav>
+
+
+        <nav class="space-y-8 px-8">
+            <h3 class="font-semibold text-lg">Quick Links</h3>
+            <a href="https://neosia.unhas.ac.id/login" class="hover:text-gray-300 block pt-4">Student Portal</a>
+            <a href="https://journal.unhas.ac.id/" class="hover:text-gray-300 block">Jurnal</a>
+            <a href="https://sikola-v2.unhas.ac.id/login/index.php" class="hover:text-gray-300 block">Sikola</a>
+        </nav>
+
+        <nav class="space-y-8 px-8">
+            <h3 class="font-semibold text-lg">Maps</h3>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3973.8105916625614!2d119.48550367436482!3d-5.134181751937442!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbefd5b8062793d%3A0xadf1342c0dbca9c2!2sUniversitas%20Hasanuddin!5e0!3m2!1sid!2sid!4v1730559537698!5m2!1sid!2sid" width="220" height="220" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </nav>
+    </div>
 </footer>
 
-<div class="bg-blueSecondary text-white py-4 ps-3">
-  <p>&copy; Hasanuddin University. All Rights Reserved.</p>
+<!-- Footer Bottom -->
+<div class="bg-blueSecondary text-start py-4 ps-3 text-white">
+    <p>&copy; Hasanuddin University. All Rights Reserved.</p>
 </div>

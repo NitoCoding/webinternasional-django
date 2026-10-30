@@ -1,0 +1,70 @@
+        <!-- Study Program Section -->
+        <section class="py-20 bg-gradient-to-b from-gray-50 to-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16" data-aos="fade-up">
+                    <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                        Study <span
+                            class="text-transparent bg-clip-text bg-gradient-to-r from-redPrimary to-blueSecondary">Programs</span>
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Choose from our wide range of internationally accredited programs
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {% for sp in study_programs %}
+                        <a href="{% url 'website:study_program_detail' sp.pk %}" class="group block">
+                            <div class="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300
+                                        transform hover:-translate-y-2 overflow-hidden h-96"
+                                data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 100 %}">
+                                <!-- Gradient Border Effect -->
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-redPrimary via-bluePrimary to-blueSecondary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                </div>
+
+                                <!-- Content -->
+                                <div class="relative bg-white rounded-2xl overflow-hidden h-full flex flex-col">
+                                    <!-- Image Container -->
+                                    <div class="relative h-56 overflow-hidden">
+                                        {% if sp.image %}
+                                        <img src="{{ sp.image.url }}"
+                                            alt="{{ sp.name }}"
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        {% else %}
+                                        <div class="w-full h-full bg-gradient-to-br from-bluePrimary to-blueSecondary"></div>
+                                        {% endif %}
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        </div>
+
+                                        <!-- Degree Badge -->
+                                        <div class="absolute top-4 left-4">
+                                            <span
+                                                class="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-full text-sm font-bold text-redPrimary shadow-lg">
+                                                {{ sp.degree }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Program Info -->
+                                    <div class="p-6 flex flex-col flex-grow justify-between">
+                                        <h3
+                                            class="text-xl font-bold text-gray-900 mb-2 group-hover:text-redPrimary transition-colors">
+                                            {{ sp.name|cut:" (S1)" }}
+                                        </h3>
+                                        <div class="flex items-center text-gray-600">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                            </svg>
+                                            {{ sp.faculty.name }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>

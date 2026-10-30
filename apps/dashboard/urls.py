@@ -293,43 +293,10 @@ def _back_to_users(request, tab):
     return redirect(f"{reverse('dashboard:users_list')}?tab={tab}")
 
 
-def _confirm_user_action(request, student_user, action):
-    student = student_user.student
-    if action == "accept":
-        title = "Accept student?"
-        message = (
-            "This student will be verified and active, and can enroll in programs. "
-            "Only students in your study program can be accepted by staff."
-        )
-        button = "Yes, accept"
-        button_class = "bg-green-600 hover:bg-green-700"
-    else:
-        title = "Reject student?"
-        message = "This student will be deactivated and will not be able to log in."
-        button = "Yes, reject"
-        button_class = "bg-red-600 hover:bg-red-700"
-    return render(
-        request,
-        "dashboard/users/confirm_action.html",
-        {
-            "title": title,
-            "message": message,
-            "button": button,
-            "button_class": button_class,
-            "student_user": student_user,
-            "student": student,
-            "action_url": request.path,
-            "cancel_url": f"{reverse('dashboard:users_list')}?tab=waiting",
-        },
-    )
-
-
 @login_required
-@require_http_methods(["GET", "POST"])
+@require_POST
 def user_accept(request, pk):
     student_user, student = _manageable_student(request, pk)
-    if request.method == "GET":
-        return _confirm_user_action(request, student_user, "accept")
     student.status = Student.Status.ACCEPTED
     student.is_verified = True
     student.is_active = True
@@ -342,11 +309,9 @@ def user_accept(request, pk):
 
 
 @login_required
-@require_http_methods(["GET", "POST"])
+@require_POST
 def user_reject(request, pk):
     student_user, student = _manageable_student(request, pk)
-    if request.method == "GET":
-        return _confirm_user_action(request, student_user, "reject")
     student.status = Student.Status.REJECTED
     student.is_verified = False
     student.is_active = False

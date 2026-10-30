@@ -1,19 +1,132 @@
 {% extends "base.html" %}
+{% load website_tags %}
 {% block title %}{{ item.name }} - International Exposure{% endblock %}
+{% block hero %}{% include "partials/hero.html" with title=title description=description %}{% endblock %}
 {% block content %}
-<article class="container mx-auto px-6 py-12 max-w-4xl">
-  <a href="{% url 'website:ie_list' %}" class="text-redPrimary hover:underline">&larr; Back to International Exposure</a>
-  <span class="block mt-6 inline-block w-max text-xs font-semibold text-white bg-redPrimary rounded-full px-3 py-1">{{ item.ie_program.name }}</span>
-  <h1 class="text-4xl font-bold text-gray-800 mt-3">{{ item.name }}</h1>
-  <p class="text-gray-500 mt-2">{{ item.country }} &middot; {{ item.execution_date|date:"d M Y" }} - {{ item.end_date|date:"d M Y" }}</p>
-  {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full rounded-2xl shadow-lg my-8">{% endif %}
-  <div class="grid grid-cols-2 gap-4 my-6">
-    <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Participants</p><p class="font-semibold">{{ item.participants_count }}</p></div>
-    <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Course credits</p><p class="font-semibold">{{ item.course_credits }}</p></div>
-  </div>
-  <div class="text-gray-700 leading-relaxed whitespace-pre-line">{{ item.description }}</div>
-  {% if item.brochure_pdf %}
-  <a href="{{ item.brochure_pdf.url }}" class="inline-block mt-8 px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold">Download brochure</a>
-  {% endif %}
-</article>
+    <!-- Blue Navigation Bar -->
+    <div class="bg-gradient-to-r from-bluePrimary to-blueSecondary py-4 sticky top-0 z-40 shadow-md">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <!-- Logo/Text -->
+                    <div class="text-white">
+                        <h1 class="text-2xl font-bold">International Class Program</h1>
+                        <p class="text-blue-100 text-sm">Hasanuddin University</p>
+                    </div>
+                </div>
+
+                <!-- Back to Programs Button -->
+                <a href="{% url 'website:ie_list' %}"
+                    class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-medium rounded-lg hover:bg-white/30 transition-all duration-200 border border-white/30">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Programs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Article Content -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <article class="bg-white rounded-2xl shadow-xl overflow-hidden" data-aos="fade-up">
+                    <!-- Featured Image -->
+                    {% if item.image %}
+                        <div class="relative w-full aspect-[16/9] overflow-hidden">
+                            <img loading="lazy" src="{{ item.image.url }}"
+                                alt="{{ item.name }}" class="w-full h-full object-cover" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Article Body -->
+                    <div class="p-8 md:p-12">
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-8 leading-tight">
+                            {{ item.name }}
+                        </h1>
+
+                        <!-- Program Details -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-12 h-12 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Execution Date</p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ item.execution_date|date:"F d, Y" }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-12 h-12 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Location</p>
+                                    <p class="text-sm text-gray-500">{{ item.country }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-12 h-12 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Participants</p>
+                                    <p class="text-sm text-gray-500">{{ item.participants_count }} people</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Article Content -->
+                        <div class="prose prose-lg max-w-none">
+                            <div class="text-lg leading-relaxed text-gray-800">
+                                {{ item.description|linebreaksbr }}
+                            </div>
+                        </div>
+
+                        <!-- Register Button (if program is upcoming) -->
+                        {% if is_upcoming %}
+                            <div class="mt-8 text-center">
+                                <a href="{% url 'login' %}"
+                                    class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-bluePrimary to-blueSecondary text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-bluePrimary hover:to-blueSecondary transition-all duration-200">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Register Now
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        <!-- View Brochure Button -->
+                        {% if item.brochure_pdf %}
+                            <div class="mt-6 text-center">
+                                <a href="{{ item.brochure_pdf.url }}"
+                                    target="_blank"
+                                    class="inline-flex items-center px-8 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 hover:shadow-lg transition-all duration-200">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    View Brochure
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
 {% endblock %}

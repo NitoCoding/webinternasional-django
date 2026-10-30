@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "apps.core",
     "apps.accounts",
@@ -101,7 +102,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ---------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -131,6 +134,12 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
+# WhiteNoise melayani static di DEBUG=True maupun DEBUG=False.
+# DEBUG=True : file dibaca langsung dari STATICFILES_DIRS dan app (finders), tanpa collectstatic.
+# DEBUG=False: file dibaca dari STATIC_ROOT, jadi jalankan `manage.py collectstatic` setelah static berubah.
+WHITENOISE_USE_FINDERS = DEBUG
+WHITENOISE_AUTOREFRESH = DEBUG
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 # Sertifikat mahasiswa disimpan di luar MEDIA_ROOT dan hanya dibuka lewat view yang memeriksa hak akses.
@@ -146,7 +155,9 @@ LOGOUT_REDIRECT_URL = "website:home"
 # Email (reset password). Default: tampil di console.
 # ---------------------------------------------------------------------------
 
-EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="internationalClassUH@gmail.com")
 
 # API SIPAKAMASE (data mahasiswa). Diisi di .env; tanpa nilai, fitur impor mahasiswa menampilkan error.
@@ -166,10 +177,8 @@ ACADEMIC_MAX_STUDY_PERIOD_FROM_2023 = 10
 ACADEMIC_POLICY_CHANGE_YEAR = 2022
 
 
-
 # ---------------------------------------------------------------------------
 # Frontend: tanpa bundler. CSS Tailwind/DaisyUI dibangun oleh Tailwind CLI
 # (npm run build:css) ke static/css/app.css. Library JS dari npm disalin
 # ke static/vendor oleh script npm.
 # ---------------------------------------------------------------------------
-

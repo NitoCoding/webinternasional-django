@@ -1,25 +1,101 @@
-{% load static %}<!doctype html>
+{% load static %}<!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}International Class - Hasanuddin University{% endblock %}</title>
-  <link rel="icon" type="image/png" href="{% static 'images/logoUnhas.png' %}">
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style type="text/tailwindcss">
-    @theme {
-      --color-redPrimary: #991b1b;
-      --color-bluePrimary: #1e40af;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}International Class{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logoUnhas.png' %}">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            prefix: '',
+            important: true,
+            theme: {
+                extend: {
+                    colors: {
+                        redPrimary: {
+                            DEFAULT: '#991B1B',
+                            50: '#FEF2F2',
+                            100: '#FEE2E2',
+                            500: '#EF4444',
+                            600: '#DC2626',
+                            700: '#B91C1C',
+                            900: '#7F1D1D'
+                        },
+                        bluePrimary: {
+                            DEFAULT: '#1E40AF',
+                            50: '#EFF6FF',
+                            100: '#DBEAFE',
+                            500: '#3B82F6',
+                            600: '#2563EB',
+                            700: '#1D4ED8',
+                            900: '#1E3A8A'
+                        },
+                        blueSecondary: '#1E3A8A',
+                        blueThird: '#3730A3',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- DaisyUI dengan prioritas lebih rendah -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <!-- Pengganti app.css Laravel (sebelumnya @apply, ditulis langsung sebagai CSS biasa) -->
+    <style>
+        .card {
+            background-color: #fff !important;
+            border-radius: 1rem !important;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+        }
+
+        .btn {
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+            padding-top: 0.625rem !important;
+            padding-bottom: 0.625rem !important;
+            border-radius: 0.5rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .h-96 {
+            height: 24rem !important;
+        }
+
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
+        }
+    </style>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 </head>
-<body class="flex flex-col min-h-full bg-white text-gray-800">
-  {% include "partials/header.html" %}
-  <main class="flex-1">
-    {% block hero %}{% endblock %}
-    {% block content %}{% endblock %}
-  </main>
-  {% include "partials/footer.html" %}
+
+<body class="flex flex-col min-h-full">
+    {% include "partials/header.html" %}
+    <main class="flex-1">
+        {% block hero %}{% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+    {% include "partials/footer.html" %}
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
 </body>
+
 </html>

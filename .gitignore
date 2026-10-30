@@ -7,3 +7,4 @@ media/
 private_media/
 staticfiles/
 frontend/node_modules/
+.vscode/

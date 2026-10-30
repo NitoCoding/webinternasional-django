@@ -96,6 +96,18 @@ def about(request):
     )
 
 
+NEWS_DESCRIPTION = (
+    "Explore the latest updates from Hasanuddin University International Class, featuring student "
+    "achievements, international collaborations, and important developments that showcase our dedication "
+    "to global academic excellence."
+)
+EVENT_DESCRIPTION = (
+    "Discover upcoming activities and programs from Hasanuddin University International Class. From academic "
+    "workshops to cultural exchanges, these events are designed to enhance learning experiences, foster global "
+    "connections, and celebrate our diverse community."
+)
+
+
 def news_list(request):
     page = Paginator(News.objects.order_by("-created_at"), 4).get_page(
         request.GET.get("page")
@@ -106,7 +118,7 @@ def news_list(request):
         "website/news_list.html",
         {
             "title": "News",
-            "description": "Explore the latest updates from Hasanuddin University International Class.",
+            "description": NEWS_DESCRIPTION,
             "page": page,
             "popular": popular,
         },
@@ -117,23 +129,41 @@ def news_detail(request, pk):
     item = get_object_or_404(News, pk=pk)
     News.objects.filter(pk=pk).update(views=F("views") + 1)
     item.refresh_from_db(fields=["views"])
-    return render(request, "website/news_detail.html", {"title": "News", "item": item})
+    return render(
+        request,
+        "website/news_detail.html",
+        {"title": "News", "description": NEWS_DESCRIPTION, "item": item},
+    )
 
 
 def event_list(request):
+    from django.utils import timezone
+
     page = Paginator(Event.objects.order_by("-created_at"), 4).get_page(
         request.GET.get("page")
     )
+    upcoming = Event.objects.filter(event_date__gte=timezone.now()).order_by("-created_at")[:4]
     return render(
         request,
         "website/event_list.html",
         {
             "title": "Event",
-            "description": "Discover upcoming activities and programs from Hasanuddin University "
-            "International Class.",
+            "description": EVENT_DESCRIPTION,
             "page": page,
+            "upcoming": upcoming,
         },
     )
+
+
+def event_detail(request, pk):
+    item = get_object_or_404(Event, pk=pk)
+    return render(
+        request,
+        "website/event_detail.html",
+        {"title": "Event", "description": NEWS_DESCRIPTION, "item": item},
+    )
+
+
 
 
 def event_detail(request, pk):
@@ -174,7 +204,35 @@ def study_program_detail(request, pk):
     )
 
 
+IE_DESCRIPTION = (
+    "Join our International Class to experience a world-class education, expert instructors, and a diverse "
+    "community. Gain valuable skills, global insights, and hands-on learning opportunities that will prepare "
+    "you for a bright future in an interconnected world."
+)
+
+
+def _recommended_ie_programs(today):
+    """Pengganti recommendedPrograms di LandingPageController Laravel: program mendatang yang sudah punya
+    peserta approved, belum penuh, diurutkan dari peserta approved terbanyak, maksimal 5."""
+    from django.db.models import Count, F, Q
+
+    return (
+        Program.objects.select_related("ie_program")
+        .filter(execution_date__gt=today, study_programs__isnull=False, enrollments__status="approved")
+        .annotate(
+            approved_count=Count(
+                "enrollments", filter=Q(enrollments__status="approved"), distinct=True
+            )
+        )
+        .filter(approved_count__lt=F("participants_count"))
+        .order_by("-approved_count")[:5]
+    )
+
+
 def ie_list(request):
+    from django.utils import timezone
+
+    today = timezone.localdate()
     page = Paginator(
         Program.objects.select_related("ie_program").order_by("-created_at"), 5
     ).get_page(request.GET.get("page"))
@@ -183,18 +241,27 @@ def ie_list(request):
         "website/ie_list.html",
         {
             "title": "International Exposure",
-            "description": HOME_DESCRIPTION,
+            "description": IE_DESCRIPTION,
             "page": page,
+            "recommended_programs": _recommended_ie_programs(today),
+            "new_programs": Program.objects.select_related("ie_program").order_by("-created_at")[:5],
         },
     )
 
 
 def ie_detail(request, pk):
+    from django.utils import timezone
+
     item = get_object_or_404(Program.objects.select_related("ie_program"), pk=pk)
     return render(
         request,
         "website/ie_detail.html",
-        {"title": "International Exposure", "item": item},
+        {
+            "title": "International Exposure",
+            "description": IE_DESCRIPTION,
+            "item": item,
+            "is_upcoming": item.execution_date > timezone.localdate(),
+        },
     )
 
 
@@ -212,6 +279,8 @@ def degree_list(request):
             "description": "Partnership programs with prestigious international "
             "universities offering dual qualifications and global academic experience.",
             "items": items,
+            "double_items": [i for i in items if i.partnership_type == "double_degree"],
+            "joint_items": [i for i in items if i.partnership_type == "joint_degree"],
         },
     )
 

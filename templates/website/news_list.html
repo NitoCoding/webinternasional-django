@@ -1,36 +1,134 @@
 {% extends "base.html" %}
-{% block title %}News - International Class{% endblock %}
+{% load website_tags %}
+{% block title %}News - Hasanuddin University{% endblock %}
 {% block hero %}{% include "partials/hero.html" with title=title description=description %}{% endblock %}
 {% block content %}
-<section class="container mx-auto px-6 py-16 grid lg:grid-cols-3 gap-10">
-  <div class="lg:col-span-2 space-y-6">
-    {% for n in page %}
-    <a href="{% url 'website:news_detail' n.pk %}" class="flex flex-col sm:flex-row gap-5 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
-      {% if n.image %}<img src="{{ n.image.url }}" alt="" class="sm:w-64 h-48 object-cover">{% endif %}
-      <div class="p-5">
-        <p class="text-xs text-gray-500">{{ n.publication_date|date:"d F Y" }} &middot; {{ n.views }} views</p>
-        <h2 class="text-xl font-bold text-gray-800 mt-1">{{ n.title }}</h2>
-        <p class="text-gray-600 mt-2 line-clamp-3">{{ n.content|truncatechars:200 }}</p>
-      </div>
-    </a>
-    {% empty %}
-    <p class="text-gray-500">No news yet.</p>
-    {% endfor %}
-    {% include "partials/pagination.html" with page=page %}
-  </div>
+    <!-- Hero Section -->
+    <section class="relative py-20 bg-gradient-to-br from-bluePrimary via-blueSecondary to-blueThird overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 right-10 w-72 h-72 bg-white rounded-full filter blur-3xl"></div>
+            <div class="absolute bottom-10 left-10 w-96 h-96 bg-white rounded-full filter blur-3xl"></div>
+        </div>
 
-  <aside>
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Popular News</h3>
-    <div class="space-y-4">
-      {% for n in popular %}
-      <a href="{% url 'website:news_detail' n.pk %}" class="block bg-white rounded-xl shadow p-4 hover:shadow-lg">
-        <h4 class="font-semibold text-gray-800">{{ n.title }}</h4>
-        <p class="text-xs text-gray-500 mt-1">{{ n.views }} views</p>
-      </a>
-      {% empty %}
-      <p class="text-gray-500">No news yet.</p>
-      {% endfor %}
-    </div>
-  </aside>
-</section>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center" data-aos="fade-up">
+                <span class="text-white font-semibold text-sm uppercase tracking-wider mb-4 block">Latest Updates</span>
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                    Latest <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-400">News</span>
+                </h1>
+                <p class="text-xl text-white/90 max-w-2xl mx-auto">
+                    Stay informed with the latest updates from International Class Program
+                </p>
+                <div class="mt-8 flex justify-center">
+                    <div class="w-32 h-1 bg-gradient-to-r from-yellow-300 to-yellow-400 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Content Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-12 justify-center">
+                <!-- Main News -->
+                <div class="w-full lg:w-[45%]">
+                    {% for news_item in page %}
+                        <article
+                            class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden mb-6"
+                            data-aos="fade-up" data-aos-delay="{% widthratio forloop.counter0 1 100 %}">
+                            {% if news_item.image %}
+                                <div class="relative w-full aspect-[16/9] overflow-hidden group">
+                                    <img loading="lazy" src="{{ news_item.image.url }}"
+                                        alt="Featured Image for {{ news_item.title }}"
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                </div>
+                            {% endif %}
+
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <time datetime="{{ news_item.publication_date|date:'Y-m-d' }}"
+                                        class="text-xs font-semibold text-bluePrimary bg-bluePrimary/10 px-3 py-1 rounded-full">
+                                        {{ news_item.publication_date|date:"M d, Y" }}
+                                    </time>
+                                    <span class="text-xs text-gray-500">• 3 min read</span>
+                                </div>
+
+                                <h2 class="text-xl font-bold text-gray-900 mb-3 hover:text-bluePrimary transition-colors">
+                                    <a href="{% url 'website:news_detail' news_item.pk %}">
+                                        {{ news_item.title }}
+                                    </a>
+                                </h2>
+
+                                <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+                                    {{ news_item.content|striptags|str_limit:150 }}
+                                </p>
+
+                                <a href="{% url 'website:news_detail' news_item.pk %}"
+                                    class="inline-flex items-center text-bluePrimary font-medium text-sm hover:translate-x-1 transition-transform">
+                                    Read More
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <p class="text-gray-500">No news yet.</p>
+                    {% endfor %}
+
+                    <!-- Pagination -->
+                    {% if page.paginator.num_pages > 1 %}
+                        <div class="flex justify-center mt-8">
+                            {% include "partials/pagination.html" with page=page %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="w-full lg:w-[35%]">
+                    <!-- Popular News -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6" data-aos="fade-left">
+                        <div class="flex items-center mb-4">
+                            <div
+                                class="w-10 h-10 bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-lg flex items-center justify-center mr-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">Popular News</h3>
+                        </div>
+
+                        <div class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                            {% for popular_item in popular %}
+                                <a href="{% url 'website:news_detail' popular_item.pk %}"
+                                    class="group flex gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gradient-to-br hover:from-bluePrimary/5 hover:to-blueSecondary/5 hover:shadow-md transition-all duration-300">
+                                    {% if popular_item.image %}
+                                        <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden">
+                                            <img loading="lazy" src="{{ popular_item.image.url }}"
+                                                alt="Thumbnail for {{ popular_item.title }}"
+                                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                                        </div>
+                                    {% endif %}
+                                    <div class="flex-grow">
+                                        <time datetime="{{ popular_item.publication_date|date:'Y-m-d' }}"
+                                            class="text-xs font-semibold text-bluePrimary mb-1 block">
+                                            {{ popular_item.publication_date|date:"M d, Y" }}
+                                        </time>
+                                        <h4 class="text-sm font-bold text-gray-900 group-hover:text-bluePrimary transition-colors line-clamp-2 mb-1">
+                                            {{ popular_item.title|str_limit:60 }}
+                                        </h4>
+                                        <p class="text-xs text-gray-600 line-clamp-1">
+                                            {{ popular_item.content|striptags|str_limit:70 }}
+                                        </p>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
 {% endblock %}

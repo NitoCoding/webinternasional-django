@@ -221,10 +221,11 @@
           <td class="px-4 py-3">
             <div class="flex items-center justify-end gap-2">
               {% if tab == "waiting" and u.student %}
-                <a href="{% url 'dashboard:user_accept' u.pk %}" title="Accept" aria-label="Accept"
-                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-md">Accept</a>
-                <a href="{% url 'dashboard:user_reject' u.pk %}" title="Reject" aria-label="Reject"
-                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-md">Reject</a>
+                <label for="accept-modal-{{ u.pk }}" title="Accept" aria-label="Accept"
+                  class="cursor-pointer px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-md">Accept</label>
+                <label for="reject-modal-{{ u.pk }}" title="Reject" aria-label="Reject"
+                  class="cursor-pointer px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-md">Reject</label>
+                {% include "dashboard/users/_waiting_modals.html" %}
               {% elif u.student and tab != "staff" %}
                 <form method="post" action="{% url 'dashboard:user_toggle_active' u.pk %}">
                   {% csrf_token %}

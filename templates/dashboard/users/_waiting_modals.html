@@ -1,0 +1,34 @@
+{% comment %}Modal konfirmasi Accept dan Reject untuk satu mahasiswa di tab Waiting (seperti Laravel). Form POST ke endpoint user_accept atau user_reject.{% endcomment %}
+<input type="checkbox" id="accept-modal-{{ u.pk }}" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">Confirm Acceptance</h3>
+    <p class="text-sm text-gray-600 mb-4">Are you sure you want to accept this student?</p>
+    <div class="flex gap-3">
+      <label for="accept-modal-{{ u.pk }}" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+      <form method="post" action="{% url 'dashboard:user_accept' u.pk %}" class="flex-1">
+        {% csrf_token %}
+        <input type="hidden" name="tab" value="waiting">
+        <button type="submit" class="w-full py-2 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg">Yes, Accept</button>
+      </form>
+    </div>
+  </div>
+  <label class="modal-backdrop" for="accept-modal-{{ u.pk }}"></label>
+</div>
+
+<input type="checkbox" id="reject-modal-{{ u.pk }}" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">Confirm Rejection</h3>
+    <p class="text-sm text-gray-600 mb-4">Are you sure you want to reject this student?</p>
+    <div class="flex gap-3">
+      <label for="reject-modal-{{ u.pk }}" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+      <form method="post" action="{% url 'dashboard:user_reject' u.pk %}" class="flex-1">
+        {% csrf_token %}
+        <input type="hidden" name="tab" value="waiting">
+        <button type="submit" class="w-full py-2 text-sm bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg">Yes, Reject</button>
+      </form>
+    </div>
+  </div>
+  <label class="modal-backdrop" for="reject-modal-{{ u.pk }}"></label>
+</div>

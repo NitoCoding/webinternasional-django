@@ -1,89 +1,269 @@
 {% load static %}
 <header>
-  <div class="bg-white shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto px-6">
-      <div class="flex items-center justify-between h-20">
-        <a href="{% url 'website:home' %}" class="flex items-center gap-3 group">
-          <img src="{% static 'images/logoUnhas.png' %}" alt="Logo" class="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110">
-          <div class="border-l-2 border-gray-300 h-10"></div>
-          <div class="flex flex-col">
-            <span class="font-bold text-gray-800 text-sm leading-tight group-hover:text-redPrimary">International Class</span>
-            <span class="text-xs text-gray-600 group-hover:text-redPrimary">Hasanuddin University</span>
-          </div>
-        </a>
 
-        <!-- Navigasi desktop -->
-        <nav class="hidden lg:flex items-center space-x-1">
-          <a href="{% url 'website:about' %}" class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium">About</a>
-          <a href="{% url 'website:degree_list' %}" class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium">Double / Joint Degree</a>
+    <!-- Main Navbar -->
+    <div class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo (Left) -->
+                <div class="w-auto">
+                    <a href="{% url 'website:home' %}" class="flex items-center gap-3 group">
+                        <div class="relative">
+                            <img src="{% static 'images/logoUnhas.png' %}" alt="Logo"
+                                class="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110">
+                            <div
+                                class="absolute inset-0 bg-redPrimary rounded-full opacity-0 group-hover:opacity-10 transition-opacity duration-300">
+                            </div>
+                        </div>
+                        <div class="border-l-2 border-gray-300 h-10"></div>
+                        <div class="flex flex-col">
+                            <span
+                                class="font-bold text-gray-800 text-sm leading-tight group-hover:text-redPrimary transition-colors duration-300">
+                                International Class
+                            </span>
+                            <span
+                                class="text-xs text-gray-600 group-hover:text-redPrimary transition-colors duration-300">
+                                Hasanuddin University
+                            </span>
+                        </div>
+                    </a>
+                </div>
 
-          <div class="relative group">
-            <button class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium flex items-center gap-1">IUP Program</button>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100">
-              <div class="p-2">
-                <a href="{% url 'website:study_program_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
-                  <div class="font-semibold">Study Program</div>
-                  <div class="text-xs opacity-75">Explore our academic programs</div>
-                </a>
-                <a href="{% url 'website:ie_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
-                  <div class="font-semibold">International Exposure</div>
-                  <div class="text-xs opacity-75">Global opportunities</div>
-                </a>
-              </div>
+                <!-- Desktop Navigation -->
+                <nav class="hidden lg:flex items-center space-x-1">
+                    <a href="{% url 'website:about' %}"
+                        class="relative px-4 py-2 text-gray-700 hover:text-redPrimary font-medium transition-all duration-300
+                              after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-redPrimary
+                              hover:after:w-full after:transition-all after:duration-300">
+                        About
+                    </a>
+
+                    
+                    <!-- Double & Single Degree Link -->
+                    <a href="{% url 'website:degree_list' %}"
+                        class="relative px-4 py-2 text-gray-700 hover:text-redPrimary font-medium transition-all duration-300
+                              after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-redPrimary
+                              hover:after:w-full after:transition-all after:duration-300">
+                        Double / Joint Degree
+                    </a>
+
+
+                    <!-- IUP Program Dropdown -->
+                    <div class="relative group">
+                        <button
+                            class="relative px-4 py-2 text-gray-700 hover:text-redPrimary font-medium transition-all duration-300
+                                     flex items-center gap-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5
+                                     after:bg-redPrimary hover:after:w-full after:transition-all after:duration-300">
+                            IUP Program
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div
+                            class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible
+                                    group-hover:opacity-100 group-hover:visible transition-all duration-300 transform
+                                    group-hover:translate-y-0 translate-y-2 border border-gray-100">
+                            <div class="p-2">
+                                <a href="{% url 'website:study_program_list' %}"
+                                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                                          rounded-lg transition-all duration-300 group/item">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover/item:text-white" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                    <div>
+                                        <div class="font-semibold">Study Program</div>
+                                        <div class="text-xs opacity-75">Explore our academic programs</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'website:ie_list' %}"
+                                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                                          rounded-lg transition-all duration-300 group/item">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover/item:text-white" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <div class="font-semibold">International Exposure</div>
+                                        <div class="text-xs opacity-75">Global opportunities</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Information Dropdown -->
+                    <div class="relative group">
+                        <button
+                            class="relative px-4 py-2 text-gray-700 hover:text-redPrimary font-medium transition-all duration-300
+                                     flex items-center gap-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5
+                                     after:bg-redPrimary hover:after:w-full after:transition-all after:duration-300">
+                            Information
+                            <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div
+                            class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible
+                                    group-hover:opacity-100 group-hover:visible transition-all duration-300 transform
+                                    group-hover:translate-y-0 translate-y-2 border border-gray-100">
+                            <div class="p-2">
+                                <a href="{% url 'website:news_list' %}"
+                                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                                          rounded-lg transition-all duration-300 group">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                    </svg>
+                                    <div>
+                                        <div class="font-semibold">News</div>
+                                        <div class="text-xs opacity-75">Latest updates</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'website:event_list' %}"
+                                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                                          rounded-lg transition-all duration-300 group">
+                                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <div>
+                                        <div class="font-semibold">Events</div>
+                                        <div class="text-xs opacity-75">Upcoming activities</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Login Button -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <a href="{% if user.is_authenticated %}{% url 'dashboard:home' %}{% else %}{% url 'login' %}{% endif %}"
+                        class="px-6 py-2.5 text-redPrimary border-2 border-redPrimary rounded-full
+                              font-semibold hover:bg-redPrimary hover:text-white transition-all duration-300
+                              transform hover:scale-105 hover:shadow-lg">
+                        {% if user.is_authenticated %}Dashboard{% else %}Login{% endif %}
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="lg:hidden">
+                    <button onclick="toggleMobileMenu()"
+                        class="p-3 text-gray-700 hover:text-redPrimary hover:bg-gray-100 rounded-lg
+                                   transition-all duration-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
             </div>
-          </div>
 
-          <div class="relative group">
-            <button class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium flex items-center gap-1">Information</button>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100">
-              <div class="p-2">
-                <a href="{% url 'website:news_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
-                  <div class="font-semibold">News</div>
-                  <div class="text-xs opacity-75">Latest updates</div>
-                </a>
-                <a href="{% url 'website:event_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
-                  <div class="font-semibold">Events</div>
-                  <div class="text-xs opacity-75">Upcoming activities</div>
-                </a>
-              </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-200">
+                <nav class="py-4 space-y-1">
+                    <a href="{% url 'website:about' %}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                              rounded-lg transition-all duration-300 font-medium">
+                        About
+                    </a>
+
+                    <!-- Mobile IUP Program (Dropdown) -->
+                    <div>
+                        <button onclick="toggleMobileSubmenu('iupMenu')"
+                            class="w-full text-left px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                                       rounded-lg transition-all duration-300 flex justify-between items-center font-medium">
+                            IUP Program
+                            <svg class="w-5 h-5 transform transition-transform duration-300" id="iupMenuIcon"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div id="iupMenu" class="hidden pl-4 pt-2 space-y-1">
+                            <a href="{% url 'website:study_program_list' %}"
+                                class="block px-4 py-2 text-gray-600 hover:text-redPrimary hover:bg-gray-50
+                                      rounded-lg transition-all duration-300">
+                                Study Program
+                            </a>
+                            <a href="{% url 'website:ie_list' %}"
+                                class="block px-4 py-2 text-gray-600 hover:text-redPrimary hover:bg-gray-50
+                                      rounded-lg transition-all duration-300">
+                                International Exposure
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Double & Single Degree -->
+                    <a href="{% url 'website:degree_list' %}"
+                        class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                              rounded-lg transition-all duration-300 font-medium">
+                        Double / Joint Degree
+                    </a>
+
+                    <!-- Mobile Information -->
+                    <div>
+                        <button onclick="toggleMobileSubmenu('infoMenu')"
+                            class="w-full text-left px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white
+                                       rounded-lg transition-all duration-300 flex justify-between items-center font-medium">
+                            Information
+                            <svg class="w-5 h-5 transform transition-transform duration-300" id="infoMenuIcon"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div id="infoMenu" class="hidden pl-4 pt-2 space-y-1">
+                            <a href="{% url 'website:news_list' %}"
+                                class="block px-4 py-2 text-gray-600 hover:text-redPrimary hover:bg-gray-50
+                                      rounded-lg transition-all duration-300">
+                                News
+                            </a>
+                            <a href="{% url 'website:event_list' %}"
+                                class="block px-4 py-2 text-gray-600 hover:text-redPrimary hover:bg-gray-50
+                                      rounded-lg transition-all duration-300">
+                                Event
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-gray-200">
+                        <a href="{% if user.is_authenticated %}{% url 'dashboard:home' %}{% else %}{% url 'login' %}{% endif %}"
+                            class="block mx-4 px-6 py-2.5 text-center text-white bg-redPrimary
+                                  hover:bg-redPrimary/90 rounded-lg font-semibold
+                                  transition-all duration-300 transform hover:scale-105">
+                            {% if user.is_authenticated %}Dashboard{% else %}Login{% endif %}
+                        </a>
+                    </div>
+                </nav>
             </div>
-          </div>
-        </nav>
-
-        <div class="hidden lg:flex items-center">
-          {% if user.is_authenticated %}
-          <a href="{% url 'dashboard:home' %}" class="px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold hover:bg-redPrimary/90">Dashboard</a>
-          {% else %}
-          <a href="{% url 'login' %}" class="px-6 py-2.5 text-redPrimary border-2 border-redPrimary rounded-full font-semibold hover:bg-redPrimary hover:text-white transition-all duration-300">Login</a>
-          {% if allow_register %}
-          <a href="{% url 'register' %}" class="ml-2 px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold hover:bg-redPrimary/90">Register</a>
-          {% endif %}
-          {% endif %}
         </div>
-
-        <!-- Menu mobile -->
-        <details class="lg:hidden relative">
-          <summary class="p-3 text-gray-700 hover:text-redPrimary hover:bg-gray-100 rounded-lg cursor-pointer list-none">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </summary>
-          <nav class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-3 space-y-1">
-            <a href="{% url 'website:about' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">About</a>
-            <a href="{% url 'website:degree_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">Double / Joint Degree</a>
-            <a href="{% url 'website:study_program_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">Study Program</a>
-            <a href="{% url 'website:ie_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">International Exposure</a>
-            <a href="{% url 'website:news_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">News</a>
-            <a href="{% url 'website:event_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">Events</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'dashboard:home' %}" class="block px-4 py-2 mt-2 text-center text-white bg-redPrimary rounded-lg font-semibold">Dashboard</a>
-            {% else %}
-            <a href="{% url 'login' %}" class="block px-4 py-2 mt-2 text-center text-white bg-redPrimary rounded-lg font-semibold">Login</a>
-            {% if allow_register %}
-            <a href="{% url 'register' %}" class="block px-4 py-2 mt-2 text-center text-redPrimary border-2 border-redPrimary rounded-lg font-semibold">Register</a>
-            {% endif %}
-            {% endif %}
-          </nav>
-        </details>
-      </div>
     </div>
-  </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleMobileSubmenu(id) {
+            const submenu = document.getElementById(id);
+            const icon = document.getElementById(id + 'Icon');
+            submenu.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+    </script>
 </header>

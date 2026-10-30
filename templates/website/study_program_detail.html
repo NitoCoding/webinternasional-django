@@ -1,7 +1,7 @@
 {% extends "base.html" %}
+{% load website_tags %}
 {% block title %}{{ item.name }} - Study Program{% endblock %}
 {% block content %}
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <div class="flex flex-col leading-none whitespace-nowrap">
         <div class="flex flex-col justify-center items-start px-16 py-8 w-full bg-blueSecondary max-md:px-5 max-md:max-w-full"
              data-aos="fade-down">
@@ -219,8 +219,8 @@
                                                           class="self-start mt-1 text-xs font-light text-grey-200">
                                                         {{ n.publication_date|date:"M d, Y" }}
                                                     </time>
-                                                    <h4 class="mt-3 text-xs font-semibold max-md:mr-1">{{ n.title|truncatechars:80 }}</h4>
-                                                    <p class="mt-2 flex-grow break-words">{{ n.content|striptags|truncatechars:103 }}</p>
+                                                    <h4 class="mt-3 text-xs font-semibold max-md:mr-1">{{ n.title|str_limit:80 }}</h4>
+                                                    <p class="mt-2 flex-grow break-words">{{ n.content|striptags|str_limit:100 }}</p>
                                                     <a href="{% url 'website:news_detail' n.pk %}"
                                                        class="self-center px-5 py-2 max-w-full text-center border border-black border-solid hover:bg-indigo-950 hover:text-white w-[150px] max-md:px-10 max-md:mt-5">
                                                         Read more
@@ -238,8 +238,8 @@
                                    class="flex flex-col mb-5 items-start py-8 pr-3.5 pl-7 w-full bg-white rounded-3xl border-indigo-900 border-t-[6px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] max-md:pl-5 max-md:max-w-full"
                                    data-aos="fade-left"
                                    data-aos-delay="200">
-                                    <h4 class="font-semibold">{{ e.title|truncatechars:103 }}</h4>
-                                    <p class="self-stretch mt-1 max-md:max-w-full break-words">{{ e.content|striptags|truncatechars:103 }}</p>
+                                    <h4 class="font-semibold">{{ e.title|str_limit:100 }}</h4>
+                                    <p class="self-stretch mt-1 max-md:max-w-full break-words">{{ e.content|striptags|str_limit:100 }}</p>
                                     <div class="flex gap-1.5 mt-4 text-xs text-stone-900">
                                         <time datetime="{{ e.event_date|date:'Y-m-d' }}">
                                             {{ e.event_date|date:"d M, Y" }}
@@ -253,6 +253,4 @@
             </div>
         </div>
     </section>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>AOS.init();</script>
 {% endblock %}

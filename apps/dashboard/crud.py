@@ -731,7 +731,8 @@ def build_views(spec: CrudSpec):
             ctx.update(base_ctx, action="Edit")
             return ctx
 
-    class DetailV(RoleAccessMixin, OwnerScopeMixin, DetailView):
+    # Detail hanya dibaca: staff boleh melihat semua record (seperti ProgramController@show Laravel).
+    class DetailV(RoleAccessMixin, DetailView):
         permission_required = None
 
         def get_template_names(self):

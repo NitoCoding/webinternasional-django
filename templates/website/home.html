@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load website_tags %}
 {% block title %}International Class - Hasanuddin University{% endblock %}
 
 {% block hero %}
@@ -7,127 +8,11 @@
 {% endblock %}
 
 {% block content %}
-<!-- About -->
-<section class="container mx-auto px-6 py-16 grid md:grid-cols-2 gap-10 items-center">
-  <img src="{{ settings.about_image_url }}" alt="About" class="rounded-2xl shadow-lg w-full object-cover">
-  <div class="space-y-4">
-    <h2 class="text-3xl font-bold text-redPrimary">{{ settings.about_title }}</h2>
-    <p class="text-gray-600 leading-relaxed">{{ settings.about_paragraph_1 }}</p>
-    <p class="text-gray-600 leading-relaxed">{{ settings.about_paragraph_2 }}</p>
-  </div>
-</section>
-
-<!-- International Exposure -->
-<section class="bg-gray-50 py-16">
-  <div class="container mx-auto px-6">
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">International Exposure</h2>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-redPrimary">
-        <h3 class="font-semibold text-lg text-gray-800">{{ settings.ie_card_1_title }}</h3>
-        <p class="text-sm text-gray-600 mt-2">{{ settings.ie_card_1_desc }}</p>
-      </div>
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-redPrimary">
-        <h3 class="font-semibold text-lg text-gray-800">{{ settings.ie_card_2_title }}</h3>
-        <p class="text-sm text-gray-600 mt-2">{{ settings.ie_card_2_desc }}</p>
-      </div>
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-redPrimary">
-        <h3 class="font-semibold text-lg text-gray-800">{{ settings.ie_card_3_title }}</h3>
-        <p class="text-sm text-gray-600 mt-2">{{ settings.ie_card_3_desc }}</p>
-      </div>
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-redPrimary">
-        <h3 class="font-semibold text-lg text-gray-800">{{ settings.ie_card_4_title }}</h3>
-        <p class="text-sm text-gray-600 mt-2">{{ settings.ie_card_4_desc }}</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Available programs -->
-<section class="container mx-auto px-6 py-16">
-  <div class="flex items-center justify-between mb-8">
-    <h2 class="text-3xl font-bold text-gray-800">Available Programs</h2>
-    <a href="{% url 'website:ie_list' %}" class="text-redPrimary font-semibold hover:underline">View all</a>
-  </div>
-  {% if available_programs %}
-  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for p in available_programs %}
-    <a href="{% url 'website:ie_detail' p.pk %}" class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
-      {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}" class="h-48 w-full object-cover">{% endif %}
-      <div class="p-5 space-y-2">
-        <span class="inline-block text-xs font-semibold text-white bg-redPrimary rounded-full px-3 py-1">{{ p.ie_program.name }}</span>
-        <h3 class="font-bold text-gray-800">{{ p.name }}</h3>
-        <p class="text-sm text-gray-500">{{ p.country }}</p>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-  {% else %}
-  <p class="text-gray-500">No programs available yet.</p>
-  {% endif %}
-</section>
-
-<!-- Study programs -->
-<section class="bg-gray-50 py-16">
-  <div class="container mx-auto px-6">
-    <h2 class="text-3xl font-bold text-gray-800 mb-10">Study Program</h2>
-    {% if study_programs %}
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {% for sp in study_programs %}
-      <a href="{% url 'website:study_program_detail' sp.pk %}" class="bg-white rounded-2xl shadow-lg p-5 hover:shadow-xl transition">
-        <span class="text-xs text-gray-500">{{ sp.faculty.name }}</span>
-        <h3 class="font-bold text-gray-800 mt-1">{{ sp.name }}</h3>
-        <p class="text-sm text-redPrimary mt-2">{{ sp.degree }}</p>
-      </a>
-      {% endfor %}
-    </div>
-    {% else %}
-    <p class="text-gray-500">No study programs yet.</p>
-    {% endif %}
-  </div>
-</section>
-
-<!-- News & Events -->
-<section class="container mx-auto px-6 py-16 grid lg:grid-cols-2 gap-12">
-  <div>
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-3xl font-bold text-gray-800">News</h2>
-      <a href="{% url 'website:news_list' %}" class="text-redPrimary font-semibold hover:underline">View all</a>
-    </div>
-    <div class="space-y-4">
-      {% for n in news %}
-      <a href="{% url 'website:news_detail' n.pk %}" class="flex gap-4 bg-white rounded-2xl shadow p-4 hover:shadow-lg">
-        {% if n.image %}<img src="{{ n.image.url }}" alt="" class="w-28 h-20 object-cover rounded-lg">{% endif %}
-        <div>
-          <p class="text-xs text-gray-500">{{ n.publication_date|date:"d M Y" }}</p>
-          <h3 class="font-semibold text-gray-800">{{ n.title }}</h3>
-        </div>
-      </a>
-      {% empty %}
-      <p class="text-gray-500">No news yet.</p>
-      {% endfor %}
-    </div>
-  </div>
-
-  <div>
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-3xl font-bold text-gray-800">Events</h2>
-      <a href="{% url 'website:event_list' %}" class="text-redPrimary font-semibold hover:underline">View all</a>
-    </div>
-    <div class="space-y-4">
-      {% for e in events %}
-      <a href="{% url 'website:event_detail' e.pk %}" class="flex gap-4 bg-white rounded-2xl shadow p-4 hover:shadow-lg">
-        <div class="text-center bg-redPrimary text-white rounded-lg px-3 py-2 min-w-[4rem]">
-          <div class="text-2xl font-bold">{{ e.event_date|date:"d" }}</div>
-          <div class="text-xs">{{ e.event_date|date:"M Y" }}</div>
-        </div>
-        <div>
-          <h3 class="font-semibold text-gray-800">{{ e.title }}</h3>
-        </div>
-      </a>
-      {% empty %}
-      <p class="text-gray-500">No events yet.</p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+<!-- Content Section (wrapper div: Laravel memakai <main> bersarang, tidak valid di HTML) -->
+<div class="bg-gradient-to-b from-gray-50 to-white">
+    {% include "website/home/_about.html" %}
+    {% include "website/home/_ie.html" %}
+    {% include "website/home/_study_programs.html" %}
+    {% include "website/home/_news_events.html" %}
+</div>
 {% endblock %}

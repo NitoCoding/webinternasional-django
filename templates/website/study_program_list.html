@@ -1,21 +1,39 @@
 {% extends "base.html" %}
+{% load website_tags %}
 {% block title %}Study Program - International Class{% endblock %}
 {% block hero %}{% include "partials/hero.html" with title="Study Program" description="Explore the international study programs at Hasanuddin University." %}{% endblock %}
 {% block content %}
-<section class="container mx-auto px-6 py-16">
-  {% for sp in study_programs %}
-  {% if forloop.first %}<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">{% endif %}
-    <a href="{% url 'website:study_program_detail' sp.pk %}" class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
-      {% if sp.image %}<img src="{{ sp.image.url }}" alt="{{ sp.name }}" class="h-44 w-full object-cover">{% endif %}
-      <div class="p-5">
-        <p class="text-xs text-gray-500">{{ sp.faculty.name }}</p>
-        <h2 class="font-bold text-gray-800 mt-1">{{ sp.name }}</h2>
-        <p class="text-sm text-redPrimary mt-2">{{ sp.degree }}</p>
-      </div>
-    </a>
-  {% if forloop.last %}</div>{% endif %}
-  {% empty %}
-  <p class="text-gray-500">No study programs yet.</p>
-  {% endfor %}
+<section class="mx-4 md:mx-16 my-12" data-aos="fade-up">
+    <h2 class="text-bluePrimary text-3xl font-bold mt-12 mb-6" data-aos="fade-right" data-aos-duration="1200">
+        Study Program
+    </h2>
+    <div class="flex flex-wrap justify-center gap-6">
+        {% for sp in study_programs %}
+        <a href="{% url 'website:study_program_detail' sp.pk %}">
+            <div class="card bg-bluePrimary text-white w-64 h-96 shadow-lg justify-center" data-aos="flip-left"
+                data-aos-delay="{% widthratio forloop.counter 1 200 %}">
+                <div class="absolute top-0 left-0 mt-4 ml-4">
+                    <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-blueSecondary to-blueThird text-white shadow-md">
+                        {{ sp.degree }}
+                    </span>
+                </div>
+                <figure>
+                    {% if sp.image %}
+                    <img src="{{ sp.image.url }}" alt="{{ sp.name }}" class="rounded-t-lg h-60 w-64">
+                    {% endif %}
+                </figure>
+                <div class="card-body p-4 flex flex-col justify-between flex-grow">
+                    <!-- Nama Program -->
+                    <h3 class="mt-2 text-lg font-semibold">{{ sp.name|cut:" (S1)" }}</h3>
+
+                    <!-- Nama Fakultas -->
+                    <p class="absolute bottom-0 left-0 p-4 text-sm">{{ sp.faculty.name }}</p>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <p class="text-gray-500">No study programs yet.</p>
+        {% endfor %}
+    </div>
 </section>
 {% endblock %}

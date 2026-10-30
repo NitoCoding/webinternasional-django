@@ -1,41 +1,245 @@
 {% extends "base.html" %}
-{% block title %}{{ item.partner_university }} - Double / Joint Degree{% endblock %}
+{% load static %}
+{% load website_tags %}
+{% block title %}{{ title }} - Hasanuddin University{% endblock %}
+
 {% block content %}
-<section class="container mx-auto px-6 py-12 grid lg:grid-cols-3 gap-10">
-  <div class="lg:col-span-2 space-y-8">
-    <a href="{% url 'website:degree_list' %}" class="text-redPrimary hover:underline">&larr; Back to Double / Joint Degree</a>
-    <span class="inline-block text-xs font-semibold text-white bg-bluePrimary rounded-full px-3 py-1">{{ item.get_partnership_type_display }}</span>
-    <h1 class="text-4xl font-bold text-gray-800">{{ item.partner_university|default:"-" }}</h1>
-    <p class="text-gray-600">{{ item.title_of_cooperation|default:"" }}</p>
-    {% if item.image %}<img src="{{ item.image.url }}" alt="" class="w-full rounded-2xl shadow-lg">{% endif %}
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-bluePrimary via-blueSecondary to-blueThird py-16">
+        <div class="absolute inset-0 bg-black/20"></div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl mx-auto text-center text-white">
+                <!-- Country Flag -->
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-white/20 flex items-center justify-center text-5xl shadow-lg"
+                     data-aos="zoom-in">
+                    {{ item.flag_emoji|default:"🌍" }}
+                </div>
 
-    <div class="grid sm:grid-cols-2 gap-4">
-      <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Country</p><p class="font-semibold">{{ item.country|default:"-" }}</p></div>
-      <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Partner program</p><p class="font-semibold">{{ item.partner_program|default:"-" }}</p></div>
-      <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">UNHAS program</p><p class="font-semibold">{{ item.unhas_program|default:"-" }}</p></div>
-      <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Specialization</p><p class="font-semibold">{{ item.specialization|default:"-" }}</p></div>
-      <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Duration</p><p class="font-semibold">{{ item.duration|default:"-" }}</p></div>
-      <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">MoU/MoA/IA No.</p><p class="font-semibold">{{ item.mou_moa_ia_number|default:"-" }}</p></div>
-    </div>
+                <!-- Badge -->
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-bold mb-4
+                    {% if item.partnership_type == 'double_degree' %}bg-yellow-400 text-yellow-900{% elif item.partnership_type == 'joint_degree' %}bg-green-400 text-green-900{% else %}bg-blue-400 text-blue-900{% endif %}"
+                    data-aos="fade-down">
+                    {{ item.get_partnership_type_display }}
+                </span>
 
-    {% if item.program_structure %}<div><h2 class="text-2xl font-bold mb-2">Program Structure</h2><div class="text-gray-700">{{ item.program_structure|linebreaks }}</div></div>{% endif %}
-    {% if item.entry_requirements %}<div><h2 class="text-2xl font-bold mb-2">Entry Requirements</h2><div class="text-gray-700">{{ item.entry_requirements|linebreaks }}</div></div>{% endif %}
-    {% if item.highlights %}<div><h2 class="text-2xl font-bold mb-2">Highlights</h2><div class="text-gray-700">{{ item.highlights|linebreaks }}</div></div>{% endif %}
+                <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">
+                    {{ item.partner_university|default:"-" }}
+                </h1>
+                <p class="text-xl text-white/90 mb-2" data-aos="fade-up" data-aos-delay="100">
+                    {{ item.country|default:"" }}
+                </p>
+            </div>
+        </div>
+    </section>
 
-    {% if item.brochure_pdf %}
-    <a href="{{ item.brochure_pdf.url }}" class="inline-block px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold">Download brochure</a>
+    <!-- Programs Section -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="max-w-5xl mx-auto">
+                <!-- Dual Program Cards -->
+                <div class="grid md:grid-cols-2 gap-6 mb-12" data-aos="fade-up">
+                    <!-- Unhas Program -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-redPrimary">
+                        <div class="flex items-center gap-3 mb-4">
+                            <img src="{% static 'images/logoUnhas.png' %}" alt="Unhas Logo" class="w-12 h-12 object-contain">
+                            <div>
+                                <p class="text-sm text-gray-500">Hasanuddin University</p>
+                                <h3 class="font-bold text-gray-900">{{ item.unhas_program|default:"-" }}</h3>
+                            </div>
+                        </div>
+                        {% if item.study_program %}
+                            <a href="{% url 'website:study_program_detail' item.study_program.pk %}"
+                               class="text-bluePrimary text-sm hover:underline">
+                                View Study Program →
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Partner Program -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-bluePrimary">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl">
+                                {{ item.flag_emoji|default:"🌍" }}
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">{{ item.partner_university|default:"-" }}</p>
+                                <h3 class="font-bold text-gray-900">{{ item.partner_program|default:"-" }}</h3>
+                            </div>
+                        </div>
+                        {% if item.specialization %}
+                            <p class="text-sm text-gray-600">
+                                <span class="font-semibold">Specialization:</span> {{ item.specialization }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <!-- Duration -->
+                    {% if item.duration %}
+                        <div class="bg-white rounded-xl shadow-md p-6 text-center" data-aos="fade-up" data-aos-delay="100">
+                            <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+                                <svg class="w-7 h-7 text-bluePrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 mb-1">Duration</h4>
+                            <p class="text-gray-600 text-sm">{{ item.duration }}</p>
+                        </div>
+                    {% endif %}
+
+                    <!-- Degrees Earned -->
+                    <div class="bg-white rounded-xl shadow-md p-6 text-center" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-yellow-100 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-1">Degrees Earned</h4>
+                        <p class="text-gray-600 text-sm">
+                            {{ item.title_of_cooperation|default:"" }}
+                        </p>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="bg-white rounded-xl shadow-md p-6 text-center" data-aos="fade-up" data-aos-delay="300">
+                        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-1">Location</h4>
+                        <p class="text-gray-600 text-sm">{{ item.country|default:"-" }}</p>
+                    </div>
+                </div>
+
+                <!-- Program Structure -->
+                {% if item.program_structure %}
+                    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8" data-aos="fade-up">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-bluePrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            Program Structure
+                        </h3>
+                        <div class="prose prose-blue max-w-none">
+                            {% for line in item.program_structure|split_lines %}
+                                <p class="text-gray-700 mb-2 flex items-start gap-2">
+                                    <span class="text-bluePrimary mt-1">•</span>
+                                    {{ line }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Entry Requirements -->
+                {% if item.entry_requirements %}
+                    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8" data-aos="fade-up">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Entry Requirements
+                        </h3>
+                        <ul class="space-y-3">
+                            {% for requirement in item.entry_requirements|split_lines %}
+                                <li class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-gray-700">{{ requirement }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <!-- Highlights -->
+                {% if item.highlights %}
+                    <div class="bg-gradient-to-br from-bluePrimary to-blueSecondary rounded-2xl shadow-lg p-8 text-white" data-aos="fade-up">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                            Program Highlights
+                        </h3>
+                        <ul class="space-y-3">
+                            {% for highlight in item.highlights|split_lines %}
+                                <li class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                    <span class="text-white/90">{{ highlight }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Related News & Events -->
+    {% if news or events %}
+        <section class="py-12">
+            <div class="container mx-auto px-6">
+                <div class="max-w-5xl mx-auto">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">Related News & Events</h3>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        {% if news %}
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-4">Latest News</h4>
+                                <div class="space-y-4">
+                                    {% for news_item in news %}
+                                        <a href="{% url 'website:news_detail' news_item.pk %}"
+                                           class="block bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+                                            <h5 class="font-semibold text-gray-900 hover:text-bluePrimary">{{ news_item.title }}</h5>
+                                            <p class="text-sm text-gray-500 mt-1">{{ news_item.created_at|date:"d M Y" }}</p>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if events %}
+                            <div>
+                                <h4 class="font-semibold text-gray-700 mb-4">Upcoming Events</h4>
+                                <div class="space-y-4">
+                                    {% for event_item in events %}
+                                        <a href="{% url 'website:event_detail' event_item.pk %}"
+                                           class="block bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+                                            <h5 class="font-semibold text-gray-900 hover:text-bluePrimary">{{ event_item.title }}</h5>
+                                            <p class="text-sm text-gray-500 mt-1">{{ event_item.event_date|date:"d M Y" }}</p>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
     {% endif %}
-  </div>
 
-  <aside class="space-y-6">
-    <div>
-      <h3 class="text-xl font-bold text-gray-800 mb-3">Related News</h3>
-      {% for n in news %}<a href="{% url 'website:news_detail' n.pk %}" class="block bg-white rounded-xl shadow p-4 mb-3">{{ n.title }}</a>{% empty %}<p class="text-gray-500">No news yet.</p>{% endfor %}
-    </div>
-    <div>
-      <h3 class="text-xl font-bold text-gray-800 mb-3">Related Events</h3>
-      {% for e in events %}<a href="{% url 'website:event_detail' e.pk %}" class="block bg-white rounded-xl shadow p-4 mb-3">{{ e.title }}</a>{% empty %}<p class="text-gray-500">No events yet.</p>{% endfor %}
-    </div>
-  </aside>
-</section>
+    <!-- Back Button -->
+    <section class="py-8">
+        <div class="container mx-auto px-6 text-center">
+            <a href="{% url 'website:degree_list' %}"
+               class="inline-flex items-center gap-2 px-6 py-3 bg-bluePrimary text-white rounded-lg font-semibold hover:bg-blueSecondary transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Degree Programs
+            </a>
+        </div>
+    </section>
 {% endblock %}
