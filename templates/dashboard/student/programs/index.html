@@ -1,0 +1,112 @@
+{% extends "dashboard/base.html" %}
+{% block title %}International Exposure - Dashboard{% endblock %}
+{% block heading %}International Exposure{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-4">
+
+  {% include "dashboard/student/programs/_banner.html" %}
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <p class="text-sm text-gray-600">Programs available for your study program</p>
+    <form method="get" class="flex items-center gap-2">
+      <select name="ie_program_id" onchange="this.form.submit()"
+        class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+        <option value="">All types</option>
+        {% for ie in ie_programs %}
+        <option value="{{ ie.pk }}" {% if selected_ie == ie.pk|stringformat:"s" %}selected{% endif %}>{{ ie.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Program</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Schedule</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SKS</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Participants</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Your Status</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for row in rows %}
+          {% with p=row.program %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3">
+              <p class="text-sm font-semibold text-gray-900">{{ p.name }}</p>
+              <p class="text-xs text-gray-500">{{ p.country }} &middot; {{ p.ie_program.name|default:"No type" }}</p>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+              {{ p.execution_date|date:"d M Y" }} &ndash; {{ p.end_date|date:"d M Y" }}
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-700">{{ p.course_credits }}</td>
+            <td class="px-4 py-3 min-w-[9rem]">
+              {% if row.full %}
+                <span class="text-xs font-semibold text-red-600">Full</span>
+              {% else %}
+                <p class="text-sm text-gray-700">{{ row.approved }} / {{ p.participants_count }}</p>
+                <div class="mt-1 h-1.5 w-full rounded-full bg-gray-200">
+                  <div class="h-1.5 rounded-full bg-blue-600"
+                    style="width: {% widthratio row.approved p.participants_count 100 %}%"></div>
+                </div>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              {% if row.status == "approved" %}
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Approved</span>
+              {% elif row.status == "pending" %}
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Waiting</span>
+              {% else %}
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">Not enrolled</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-2">
+                <a href="{% url 'dashboard:student_program_show' p.pk %}" title="View detail" aria-label="View detail"
+                  class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-blue-600 hover:bg-blue-700 text-white">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </a>
+                {% if row.status == "approved" %}
+                  <a href="{% url 'dashboard:student_logbook_list' p.pk %}"
+                    class="px-3 py-2 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white">Logbook</a>
+                {% elif row.can_enroll %}
+                  <button type="button" class="js-enroll px-3 py-2 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+                    data-url="{{ row.enroll_url }}" data-name="{{ p.name }}">Enroll</button>
+                {% else %}
+                  <button type="button" disabled class="px-3 py-2 text-sm font-semibold rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed">Enroll</button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endwith %}
+          {% empty %}
+          <tr>
+            <td colspan="6" class="px-4 py-12 text-center">
+              <p class="text-base font-semibold text-gray-900">No programs available</p>
+              <p class="text-sm text-gray-500 mt-1">Please check back later for new programs.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page.paginator.num_pages > 1 %}
+    <div class="flex items-center justify-between gap-3 px-4 py-3 bg-gray-50 border-t border-gray-200 text-sm">
+      <p class="text-gray-600">Page {{ page.number }} of {{ page.paginator.num_pages }}</p>
+      <nav class="flex items-center gap-2">
+        {% if page.has_previous %}<a href="?page={{ page.previous_page_number }}&ie_program_id={{ selected_ie }}" class="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Previous</a>{% endif %}
+        {% if page.has_next %}<a href="?page={{ page.next_page_number }}&ie_program_id={{ selected_ie }}" class="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Next</a>{% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% include "dashboard/student/programs/_enroll_dialog.html" %}
+{% endblock %}

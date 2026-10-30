@@ -1,0 +1,129 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ action }} Event - Dashboard{% endblock %}
+{% block heading %}{{ action }} Event{% endblock %}
+{% block content %}
+<style>
+  /* Widget dari StyledModelForm memakai kelas DaisyUI; CSS ini hanya berlaku di form ini. */
+  .compact-form .input, .compact-form .select { height: auto; min-height: 2.5rem; padding: .5rem .75rem; font-size: .875rem; }
+  .compact-form .textarea { min-height: 8rem; padding: .5rem .75rem; font-size: .875rem; }
+  .compact-form .file-input { font-size: .875rem; }
+</style>
+
+<div class="max-w-3xl mx-auto compact-form space-y-4">
+
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">{{ action }} Event</h2>
+        <p class="text-gray-500 text-sm mt-1">Event content, schedule, and publication details.</p>
+      </div>
+      <a href="{{ list_url }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-colors">Back</a>
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+    <ul class="list-disc list-inside space-y-1 text-sm text-red-700">
+      {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <!-- 1. Event Information -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">1</span>
+        Event Information
+      </h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+          {{ form.title }}
+          {% for err in form.title.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div class="md:col-span-2">
+          <label for="{{ form.study_program.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Study Program <span class="text-red-500">*</span></label>
+          {{ form.study_program }}
+          {% for err in form.study_program.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Schedule -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">2</span>
+        Schedule
+      </h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label for="{{ form.event_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Event Date <span class="text-red-500">*</span></label>
+          {{ form.event_date }}
+          {% for err in form.event_date.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.publication_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Publication Date <span class="text-red-500">*</span></label>
+          {{ form.publication_date }}
+          {% for err in form.publication_date.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Content -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">3</span>
+        Content
+      </h3>
+      <label for="{{ form.content.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
+      {{ form.content }}
+      {% for err in form.content.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+    </section>
+
+    <!-- 4. Media -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5" data-upload>
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">4</span>
+        Media
+      </h3>
+      <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Image {% if not form.instance.pk %}<span class="text-red-500">*</span>{% endif %}</label>
+      <div class="px-4 py-3 bg-white border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+        {{ form.image }}
+      </div>
+      <div data-preview-wrap class="mt-3 {% if not form.image.value %}hidden{% endif %}">
+        <p class="text-sm text-gray-600 mb-2">Preview:</p>
+        <img data-preview src="{% if form.image.value %}{{ form.image.value.url }}{% endif %}" alt="Image preview"
+          class="max-w-md max-h-32 object-cover rounded-lg border border-gray-300">
+      </div>
+      {% for err in form.image.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+    </section>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <a href="{{ list_url }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors">Cancel</a>
+      <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+        {% if action == "New" %}Create Event{% else %}Save Changes{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.querySelectorAll('[data-upload] input[type=file]').forEach(function (input) {
+  input.addEventListener('change', function () {
+    var file = input.files[0];
+    var box = input.closest('[data-upload]');
+    var wrap = box.querySelector('[data-preview-wrap]');
+    var img = box.querySelector('[data-preview]');
+    if (file && file.type.indexOf('image/') === 0) {
+      img.src = URL.createObjectURL(file);
+      wrap.classList.remove('hidden');
+    }
+  });
+});
+</script>
+{% endblock %}

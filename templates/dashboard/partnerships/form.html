@@ -1,0 +1,244 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ action }} Partnership - Dashboard{% endblock %}
+{% block heading %}{{ action }} Partnership{% endblock %}
+{% block content %}
+<style>
+  /* Widget dari StyledModelForm memakai kelas DaisyUI; CSS ini hanya berlaku di form ini. */
+  .compact-form .input, .compact-form .select { height: auto; min-height: 2.5rem; padding: .5rem .75rem; font-size: .875rem; }
+  .compact-form .textarea { min-height: 6rem; padding: .5rem .75rem; font-size: .875rem; }
+  .compact-form .file-input { font-size: .875rem; }
+</style>
+<div class="max-w-3xl mx-auto compact-form space-y-4">
+
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">{{ action }} Partnership</h2>
+        <p class="text-gray-500 text-sm mt-1">
+          {% if action == "New" %}Create a new Double or Joint Degree partnership.{% else %}Update this Double or Joint Degree partnership.{% endif %}
+        </p>
+      </div>
+      <a href="{{ list_url }}"
+        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-colors">
+        Back
+      </a>
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+    <ul class="list-disc list-inside space-y-1 text-sm text-red-700">
+      {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <!-- 1. Partner Information -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">1</span>
+        Partner Information
+      </h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label for="{{ form.partner_university.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Partner University <span class="text-red-500">*</span>
+          </label>
+          {{ form.partner_university }}
+          {% for err in form.partner_university.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.country_flag.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Partner Country <span class="text-red-500">*</span>
+          </label>
+          {{ form.country_flag }}
+          <p class="text-xs text-gray-500 mt-1">Used to show where the partner is located.</p>
+          {% for err in form.country_flag.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Program Details -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">2</span>
+        Program Details
+      </h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label for="{{ form.partnership_type.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Type <span class="text-red-500">*</span>
+          </label>
+          {{ form.partnership_type }}
+          {% for err in form.partnership_type.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.duration.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Duration <span class="text-red-500">*</span>
+          </label>
+          {{ form.duration }}
+          {% for err in form.duration.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.unhas_program.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Unhas Study Program <span class="text-red-500">*</span>
+          </label>
+          {{ form.unhas_program }}
+          {% for err in form.unhas_program.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.partner_program.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Partner Program <span class="text-red-500">*</span>
+          </label>
+          {{ form.partner_program }}
+          {% for err in form.partner_program.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.specialization.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Unhas Program Title</label>
+          {{ form.specialization }}
+          {% for err in form.specialization.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.title_of_cooperation.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Partnership Title</label>
+          {{ form.title_of_cooperation }}
+          {% for err in form.title_of_cooperation.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Detailed Information -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">3</span>
+        Detailed Information
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <label for="{{ form.program_structure.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Program Structure <span class="text-gray-400 font-normal">(one item per line)</span>
+          </label>
+          {{ form.program_structure }}
+          {% for err in form.program_structure.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.entry_requirements.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Entry Requirements <span class="text-gray-400 font-normal">(one requirement per line)</span>
+          </label>
+          {{ form.entry_requirements }}
+          {% for err in form.entry_requirements.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.highlights.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            Highlights <span class="text-gray-400 font-normal">(one highlight per line)</span>
+          </label>
+          {{ form.highlights }}
+          {% for err in form.highlights.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Media and Status -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">4</span>
+        Media and Status
+      </h3>
+
+      <div class="mb-5" data-upload>
+        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Program Image</label>
+        <div class="px-4 py-3 bg-white border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+          {{ form.image }}
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Recommended: 800x400px, max 2MB</p>
+        <div data-preview-wrap class="mt-3 {% if not form.image.value %}hidden{% endif %}">
+          <p class="text-sm text-gray-600 mb-2">Preview:</p>
+          <img data-preview src="{% if form.image.value %}{{ form.image.value.url }}{% endif %}" alt="Image preview"
+            class="max-w-md max-h-32 object-cover rounded-lg border border-gray-300">
+        </div>
+        {% for err in form.image.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+      </div>
+
+      <div class="mb-5">
+        <label for="{{ form.brochure_pdf.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Brochure (PDF)</label>
+        <div class="px-4 py-3 bg-white border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+          {{ form.brochure_pdf }}
+        </div>
+        <p class="text-xs text-gray-500 mt-1">PDF, up to 5MB</p>
+        <div id="pdfPreview" class="mt-3 hidden">
+          <p class="text-sm text-gray-600 mb-2">Selected PDF:</p>
+          <p id="pdfFileName" class="text-sm text-gray-700 font-medium"></p>
+        </div>
+        {% for err in form.brochure_pdf.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+      </div>
+
+      <div class="flex items-center gap-3">
+        {{ form.is_active }}
+        <label for="{{ form.is_active.id_for_label }}" class="text-sm text-gray-700">Active (visible on public site)</label>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <a href="{{ list_url }}"
+        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors">
+        Cancel
+      </a>
+      <button type="submit"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+        {% if action == "New" %}Create Partnership{% else %}Save Changes{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.querySelectorAll('[data-autocomplete-url]').forEach(function (input) {
+  var list = document.createElement('datalist');
+  list.id = input.id + '-options';
+  input.setAttribute('list', list.id);
+  input.setAttribute('autocomplete', 'off');
+  input.after(list);
+  var timer;
+  input.addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      fetch(input.dataset.autocompleteUrl + '?query=' + encodeURIComponent(input.value))
+        .then(function (r) { return r.json(); })
+        .then(function (items) {
+          list.innerHTML = '';
+          items.slice(0, 20).forEach(function (p) {
+            var option = document.createElement('option');
+            option.value = p.prodiNama;
+            list.appendChild(option);
+          });
+        });
+    }, 250);
+  });
+});
+
+document.querySelectorAll('[data-upload] input[type=file]').forEach(function (input) {
+  input.addEventListener('change', function () {
+    var file = input.files[0];
+    var box = input.closest('[data-upload]');
+    var wrap = box.querySelector('[data-preview-wrap]');
+    var img = box.querySelector('[data-preview]');
+    if (file && file.type.indexOf('image/') === 0) {
+      img.src = URL.createObjectURL(file);
+      wrap.classList.remove('hidden');
+    }
+  });
+});
+
+document.querySelector('input[name="brochure_pdf"]').addEventListener('change', function (event) {
+  var file = event.target.files[0];
+  if (file) {
+    document.getElementById('pdfFileName').textContent = file.name;
+    document.getElementById('pdfPreview').classList.remove('hidden');
+  }
+});
+</script>
+{% endblock %}

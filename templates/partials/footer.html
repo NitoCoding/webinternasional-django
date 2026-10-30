@@ -1,0 +1,39 @@
+{% load static %}
+<footer class="bg-bluePrimary text-white relative overflow-hidden">
+  <div class="absolute inset-0 z-0 opacity-10">
+    <img src="{% static 'images/logoUnhasWhite.png' %}" alt="" class="max-h-full">
+  </div>
+
+  <div class="container mx-auto relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start px-12 py-12 pb-16">
+    <div class="space-y-4">
+      <div class="flex items-center gap-4">
+        <img src="{% static 'images/logoUnhas.png' %}" alt="Logo" class="w-14">
+        <div class="w-px h-16 bg-white"></div>
+        <span class="font-bold text-2xl">Hasanuddin <br> University</span>
+      </div>
+      <p>{{ footer.footer_address }}</p>
+      <p>Phone: {{ footer.footer_phone }}</p>
+      <p>Email: {{ footer.footer_email }}</p>
+    </div>
+
+    <nav class="space-y-4">
+      <h3 class="font-semibold text-lg">Pages</h3>
+      <a href="{% url 'website:about' %}" class="block hover:text-gray-300">About</a>
+      <a href="{% url 'website:study_program_list' %}" class="block hover:text-gray-300">Study Program</a>
+      <a href="{% url 'website:ie_list' %}" class="block hover:text-gray-300">IE Program</a>
+      <a href="{% url 'website:news_list' %}" class="block hover:text-gray-300">News</a>
+      <a href="{% url 'website:event_list' %}" class="block hover:text-gray-300">Event</a>
+    </nav>
+
+    <nav class="space-y-4">
+      <h3 class="font-semibold text-lg">Quick Links</h3>
+      <a href="https://neosia.unhas.ac.id/login" class="block hover:text-gray-300">Portal Mahasiswa</a>
+      <a href="https://journal.unhas.ac.id/" class="block hover:text-gray-300">Jurnal</a>
+      <a href="https://sikola-v2.unhas.ac.id/login/index.php" class="block hover:text-gray-300">Sikola</a>
+    </nav>
+  </div>
+</footer>
+
+<div class="bg-blueSecondary text-white py-4 ps-3">
+  <p>&copy; Hasanuddin University. All Rights Reserved.</p>
+</div>

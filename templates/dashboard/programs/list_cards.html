@@ -1,0 +1,45 @@
+{% extends "dashboard/crud/list_shell.html" %}
+{% block page_title %}International Exposure{% endblock %}
+{% block page_subtitle %}Manage international exposure programs{% endblock %}
+{% block add_label %}Add Program{% endblock %}
+{% block search_placeholder %}Search programs by name...{% endblock %}
+{% block list_rows %}
+  <div class="divide-y divide-gray-100">
+    {% for row in rows %}
+      <div class="p-5 hover:bg-gray-50 transition-colors duration-200">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex-1">
+            <a href="{{ row.detail_url }}"
+              class="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">{{ row.obj.name }}</a>
+            <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {{ row.obj.country|default:"-" }}
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                {{ row.obj.execution_date|date:"d M Y" }}
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {{ row.obj.participants_count }} Participants
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            {% include "dashboard/partials/row_actions.html" with row=row entity="Program" %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+{% block empty_title %}No Programs Found{% endblock %}
+{% block empty_hint %}Start by creating a new program.{% endblock %}

@@ -1,0 +1,80 @@
+{% if messages %}
+{% for m in messages %}
+{% if m.level_tag == "success" or m.level_tag == "info" %}
+<div class="flash-modal fixed inset-0 z-[9999] flex items-center justify-center p-4" data-autodismiss="4000" style="display: none;">
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" data-flash-close></div>
+  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-5">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-3">
+      <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 text-center mb-2">{% if m.level_tag == "info" %}Information{% else %}Success{% endif %}</h3>
+    <p class="text-sm text-gray-600 text-center mb-4">{{ m }}</p>
+    <button type="button" data-flash-close class="w-full py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">
+      OK
+    </button>
+    <div class="mt-3">
+      <div class="h-1 bg-gray-200 rounded-full overflow-hidden">
+        <div class="flash-bar h-full bg-green-600 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="flash-modal fixed inset-0 z-[9999] flex items-center justify-center p-4" style="display: none;">
+  <div class="fixed inset-0 bg-black/50" data-flash-close></div>
+  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-5">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-3">
+      <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 text-center mb-2">{% if m.level_tag == "warning" %}Warning{% else %}Error{% endif %}</h3>
+    <p class="text-sm text-gray-600 text-center mb-4">{{ m }}</p>
+    <button type="button" data-flash-close class="w-full py-2 text-sm bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg">
+      Close
+    </button>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<style>
+  @keyframes flash-shrink {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modals = Array.from(document.querySelectorAll('.flash-modal'));
+    if (!modals.length) return;
+
+    // Hanya tampilkan satu modal, sama seperti flash-modals.blade.php
+    const current = modals[0];
+    modals.slice(1).forEach(function (m) { m.remove(); });
+
+    function close() {
+      current.style.display = 'none';
+    }
+
+    current.querySelectorAll('[data-flash-close]').forEach(function (el) {
+      el.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+
+    setTimeout(function () {
+      current.style.display = 'flex';
+      const delay = current.dataset.autodismiss;
+      if (delay) {
+        const bar = current.querySelector('.flash-bar');
+        bar.style.animation = 'flash-shrink ' + delay + 'ms linear forwards';
+        setTimeout(close, parseInt(delay, 10));
+      }
+    }, 100);
+  });
+</script>
+{% endif %}

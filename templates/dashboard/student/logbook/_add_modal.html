@@ -1,0 +1,47 @@
+{% comment %}Modal form untuk menambah entry logbook. Tanggal dibatasi periode program lewat atribut min dan max.{% endcomment %}
+<input type="checkbox" id="add-entry-modal" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5 max-h-[90vh] overflow-y-auto">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">Add Logbook Entry</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      Dates must be within the program period ({{ program.execution_date|date:"d M Y" }} – {{ program.end_date|date:"d M Y" }}).
+    </p>
+    <form method="post" action="{{ create_url }}" enctype="multipart/form-data" class="space-y-3">
+      {% csrf_token %}
+      <div>
+        <label for="entry-name" class="block text-sm font-semibold text-gray-700 mb-1">Activity Name</label>
+        <input id="entry-name" name="name" type="text" maxlength="50" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="entry-start" class="block text-sm font-semibold text-gray-700 mb-1">Start Time</label>
+        <input id="entry-start" name="start_time" type="datetime-local" required
+          min="{{ program.execution_date|date:'Y-m-d' }}T00:00" max="{{ program.end_date|date:'Y-m-d' }}T23:59"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="entry-end" class="block text-sm font-semibold text-gray-700 mb-1">End Time</label>
+        <input id="entry-end" name="end_time" type="datetime-local" required
+          min="{{ program.execution_date|date:'Y-m-d' }}T00:00" max="{{ program.end_date|date:'Y-m-d' }}T23:59"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="entry-description" class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+        <textarea id="entry-description" name="description" rows="3" maxlength="50" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+        <p class="text-xs text-gray-500 mt-1">Max 50 characters.</p>
+      </div>
+      <div>
+        <label for="entry-image" class="block text-sm font-semibold text-gray-700 mb-1">Image (optional)</label>
+        <input id="entry-image" name="image" type="file" accept=".jpg,.jpeg,.png,.gif"
+          class="w-full text-sm text-gray-700 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+        <p class="text-xs text-gray-500 mt-1">JPG, PNG, or GIF. Max 2 MB.</p>
+      </div>
+      <div class="flex gap-3 pt-1">
+        <label for="add-entry-modal" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+        <button type="submit" class="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Save Entry</button>
+      </div>
+    </form>
+  </div>
+  <label class="modal-backdrop" for="add-entry-modal"></label>
+</div>

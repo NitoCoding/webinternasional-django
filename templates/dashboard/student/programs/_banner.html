@@ -1,0 +1,16 @@
+{% comment %}Banner status untuk halaman International Exposure. Dipakai di daftar dan detail.{% endcomment %}
+{% if gate %}
+<div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+  <p>{{ gate.text }}</p>
+  {% if gate.action %}
+  <form method="post" action="{{ register_url }}">
+    {% csrf_token %}
+    <button type="submit" class="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">{{ gate.action }}</button>
+  </form>
+  {% endif %}
+</div>
+{% elif current %}
+<div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+  You are in progress in <strong>{{ current.program.name }}</strong>. You can enroll in another program after it is finished.
+</div>
+{% endif %}

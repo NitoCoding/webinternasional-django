@@ -1,0 +1,143 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ object }} - Dashboard{% endblock %}
+{% block heading %}Partnership Details{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-4">
+
+  <!-- Header -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <a href="{{ list_url }}" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Back to partnerships" title="Back">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </a>
+      <div>
+        <h2 class="font-bold text-xl text-gray-900">{{ object.partner_university|default:"Partnership" }}</h2>
+        <p class="text-sm text-gray-500">Partnership details</p>
+      </div>
+    </div>
+    <a href="{% url 'dashboard:partnerships_update' object.pk %}"
+      class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+      Edit
+    </a>
+  </div>
+
+  <!-- Summary -->
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col md:flex-row">
+    {% if object.image %}
+      <img src="{{ object.image.url }}" alt="{{ object.partner_university }}" class="w-full md:w-56 h-40 object-cover">
+    {% else %}
+      <div class="w-full md:w-56 h-40 bg-gray-100 flex items-center justify-center text-sm text-gray-500">No image available</div>
+    {% endif %}
+    <div class="p-5 flex flex-col justify-center gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xl" aria-hidden="true">{{ object.flag_emoji|default:"🌍" }}</span>
+        <div>
+          <p class="text-base font-semibold text-gray-900">{{ object.partner_university|default:"-" }}</p>
+          <p class="text-sm text-gray-500">{{ object.country|default:"-" }}</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold
+          {% if object.partnership_type == 'double_degree' %}bg-yellow-100 text-yellow-800{% elif object.partnership_type == 'joint_degree' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-700{% endif %}">
+          {{ object.get_partnership_type_display }}
+        </span>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold {% if object.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-600{% endif %}">
+          {% if object.is_active %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key values -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</p>
+      <p class="text-base font-bold text-blue-600 mt-1">{{ object.get_partnership_type_display }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Duration</p>
+      <p class="text-base font-bold text-blue-600 mt-1">{{ object.duration|default:"-" }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</p>
+      <p class="text-base font-bold text-blue-600 mt-1">{% if object.is_active %}Active{% else %}Inactive{% endif %}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+    <!-- 1. Partner Information -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Partner Information</h3>
+      <dl class="grid grid-cols-1 gap-y-4">
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Partner University</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ object.partner_university|default:"-" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Country</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ object.country|default:"-" }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- 2. Program Details -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Program Details</h3>
+      <dl class="grid grid-cols-2 gap-x-6 gap-y-4">
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unhas Program</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ object.unhas_program|default:"-" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Partner Program</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ object.partner_program|default:"-" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unhas Program Title</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ object.specialization|default:"-" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Partnership Title</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ object.title_of_cooperation|default:"-" }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <!-- 3. Detailed Information -->
+  <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Detailed Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <div>
+        <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Program Structure</dt>
+        <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">{{ object.program_structure|default:"-" }}</dd>
+      </div>
+      <div>
+        <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Entry Requirements</dt>
+        <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">{{ object.entry_requirements|default:"-" }}</dd>
+      </div>
+      <div class="md:col-span-2">
+        <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Highlights</dt>
+        <dd class="text-sm text-gray-900 mt-1 whitespace-pre-line">{{ object.highlights|default:"-" }}</dd>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Brochure -->
+  <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+    <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Brochure</h3>
+    {% if object.brochure_pdf %}
+      <a href="{{ object.brochure_pdf.url }}" target="_blank"
+        class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+        Open brochure PDF
+      </a>
+    {% else %}
+      <p class="text-sm text-gray-500">No brochure uploaded.</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

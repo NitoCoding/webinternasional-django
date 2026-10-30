@@ -1,0 +1,84 @@
+{% extends "dashboard/base.html" %}
+{% comment %}
+  Kerangka list admin (bahasa Inggris).
+  Child template mengisi blok: page_title, page_subtitle, add_label, search_placeholder,
+  list_rows, empty_title, empty_hint.
+  Variabel dari ListV: rows, page_obj, is_paginated, search, list_url, create_url.
+{% endcomment %}
+{% block heading %}{% block page_title %}{% endblock %}{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+
+  <!-- Toolbar: subtitle + primary action -->
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <p class="text-gray-600 text-sm">{% block page_subtitle %}{% endblock %}</p>
+    {% block toolbar_actions %}{% if create_url %}
+    <a href="{{ create_url }}"
+      class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      {% block add_label %}Add{% endblock %}
+    </a>
+    {% endif %}{% endblock %}
+  </div>
+
+  <!-- Tabs (diisi child template) -->
+  {% block list_tabs %}{% endblock %}
+
+  <!-- Search -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 p-4">
+    <form method="get" action="{{ list_url }}" class="flex flex-wrap items-center gap-3">
+      <div class="flex-1 min-w-[16rem] relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input type="text" name="search" value="{{ search }}" placeholder="{% block search_placeholder %}Search...{% endblock %}"
+          class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200">
+      </div>
+      {% block list_filters %}{% endblock %}
+      <button type="submit"
+        class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+        Search
+      </button>
+      <a href="{{ list_url }}" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 font-medium">Clear</a>
+    </form>
+  </div>
+
+  <!-- Results -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    {% if rows %}
+      {% block list_rows %}{% endblock %}
+    {% else %}
+      <div class="text-center py-16 px-6">
+        <p class="text-xl font-bold text-gray-900 mb-2">{% block empty_title %}No records found{% endblock %}</p>
+        <p class="text-gray-500">{% block empty_hint %}{% endblock %}</p>
+      </div>
+    {% endif %}
+
+    {% if is_paginated %}
+    <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 bg-gray-50 border-t border-gray-200 text-sm">
+      <p class="text-gray-600">
+        Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+      </p>
+      <nav class="flex items-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}&{{ filter_qs }}"
+            class="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Previous</a>
+        {% else %}
+          <span class="px-3 py-1.5 border border-gray-200 rounded-lg text-gray-400">Previous</span>
+        {% endif %}
+        <span class="px-2 text-gray-700">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}&{{ filter_qs }}"
+            class="px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Next</a>
+        {% else %}
+          <span class="px-3 py-1.5 border border-gray-200 rounded-lg text-gray-400">Next</span>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

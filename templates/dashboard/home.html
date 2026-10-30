@@ -1,0 +1,170 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+{% if no_staff_profile %}
+<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 text-sm text-yellow-800">
+  Your staff account is not linked to a study program yet. Please contact the admin.
+</div>
+{% else %}
+<div class="space-y-6">
+
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">Student Statistics</h2>
+      <p class="text-sm text-gray-500 mt-1">
+        Total: {{ total }} Students{% if study_program %} &middot; {{ study_program.name }}{% endif %}
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      {% for value, label in status_options %}
+      <a href="{% url 'dashboard:home' %}?status={{ value }}"
+        class="px-4 py-2 text-sm font-semibold rounded-lg {% if status == value %}bg-blue-600 text-white{% else %}bg-white text-gray-700 border border-gray-200 hover:bg-gray-50{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if is_admin %}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">By Enrollment Year</h3></div>
+      <div class="p-5"><div class="w-full h-64"><canvas id="studentChart"></canvas></div></div>
+    </div>
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">By Study Programs</h3></div>
+      <div class="p-5"><div class="w-full h-64"><canvas id="studentChart2"></canvas></div></div>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">IE Programs Statistics</h3></div>
+      <div class="p-5"><div class="w-full h-52"><canvas id="studentChart4"></canvas></div></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">IE Programs</h3></div>
+      <div class="p-5"><div class="w-full h-56 flex items-center justify-center"><canvas id="studentChart3"></canvas></div></div>
+    </div>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">Student Statistics by Enrollment Year</h3></div>
+    <div class="p-5"><div class="w-full h-64"><canvas id="studentChart"></canvas></div></div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">Student Distribution by Study Programs</h3></div>
+      <div class="p-5"><div class="w-full h-56"><canvas id="studentChart2"></canvas></div></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-5 py-3 border-b border-gray-100"><h3 class="text-base font-bold text-gray-900">IE Programs</h3></div>
+      <div class="p-5"><div class="w-full h-56 flex items-center justify-center"><canvas id="studentChart3"></canvas></div></div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{{ chart|json_script:"dashboard-chart-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var data = JSON.parse(document.getElementById("dashboard-chart-data").textContent);
+  var grid = { color: "rgba(0, 0, 0, 0.05)" };
+
+  function canvas(id) { return document.getElementById(id); }
+
+  // Grafik 1: mahasiswa per angkatan
+  if (canvas("studentChart")) {
+    new Chart(canvas("studentChart").getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: data.batchLabels,
+        datasets: [{
+          label: "Number of Students",
+          data: data.batchCounts,
+          backgroundColor: "rgba(99, 102, 241, 0.8)",
+          borderColor: "rgba(99, 102, 241, 1)",
+          borderWidth: 1,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: grid }, x: { grid: { display: false } } }
+      }
+    });
+  }
+
+  // Grafik 2: mahasiswa per program studi, bertumpuk per angkatan
+  if (canvas("studentChart2")) {
+    new Chart(canvas("studentChart2").getContext("2d"), {
+      type: "bar",
+      data: { labels: data.programLabels, datasets: data.datasets },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "top", labels: { usePointStyle: true, padding: 15 } } },
+        scales: {
+          x: { stacked: true, beginAtZero: true, grid: grid },
+          y: { stacked: true, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Grafik 3: peserta IE per jenis program (doughnut)
+  if (canvas("studentChart3") && data.ieLabels && data.ieLabels.length > 0) {
+    new Chart(canvas("studentChart3").getContext("2d"), {
+      type: "doughnut",
+      data: {
+        labels: data.ieLabels,
+        datasets: [{
+          data: data.ieCounts,
+          backgroundColor: ["#6366F1", "#14B8A6", "#F472B6", "#F59E0B"],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "60%",
+        plugins: { legend: { position: "bottom", labels: { usePointStyle: true, padding: 10, font: { size: 11 } } } }
+      }
+    });
+  }
+
+  // Grafik 4 (admin): peserta IE yang disetujui per tahun
+  if (canvas("studentChart4") && data.yearLabels) {
+    new Chart(canvas("studentChart4").getContext("2d"), {
+      type: "line",
+      data: {
+        labels: data.yearLabels,
+        datasets: [{
+          label: "Total Students",
+          data: data.yearCounts,
+          borderColor: "#6366F1",
+          backgroundColor: "rgba(99, 102, 241, 0.1)",
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: "#6366F1",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: grid }, x: { grid: { display: false } } }
+      }
+    });
+  }
+});
+</script>
+{% endif %}
+{% endblock %}

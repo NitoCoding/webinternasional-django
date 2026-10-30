@@ -1,0 +1,54 @@
+{% extends "dashboard/crud/list_shell.html" %}
+{% block page_title %}Study Programs{% endblock %}
+{% block page_subtitle %}Manage study programs{% endblock %}
+{% block add_label %}Add Study Program{% endblock %}
+{% block search_placeholder %}Search study programs by name...{% endblock %}
+{% block list_filters %}
+  <select name="faculty" onchange="this.form.submit()"
+    class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+    <option value="">All Faculties</option>
+    {% for f in faculties %}
+      <option value="{{ f.pk }}" {% if selected.faculty == f.pk|stringformat:"s" %}selected{% endif %}>{{ f.name }}</option>
+    {% endfor %}
+  </select>
+{% endblock %}
+{% block list_rows %}
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Study Program</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Faculty</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Degree</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Accreditation</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for row in rows %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3">
+            <a href="{{ row.detail_url }}" class="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">{{ row.obj.name }}</a>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ row.obj.faculty.name|default:"-" }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ row.obj.degree|default:"-" }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ row.obj.national_accreditation|default:"-" }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-2">
+              <a href="{% url 'website:study_program_detail' row.obj.pk %}" target="_blank" title="View on website" aria-label="View on website"
+                class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-gray-600 hover:bg-gray-700 text-white shadow-md hover:shadow-lg transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </a>
+              {% include "dashboard/partials/row_actions.html" with row=row entity="Study Program" %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+{% block empty_title %}No Study Programs Found{% endblock %}
+{% block empty_hint %}Start by creating a new study program.{% endblock %}

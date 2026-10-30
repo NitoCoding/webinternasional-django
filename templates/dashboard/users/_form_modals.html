@@ -1,0 +1,130 @@
+{% comment %}Modal form untuk Add Student, Upload CSV, dan English Score. Dibuka dengan checkbox toggle, sama seperti modal lain.{% endcomment %}
+
+<input type="checkbox" id="add-student-modal" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">Add Student</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      Enter the student NIM. Data is fetched from SIPAKAMASE. The new account's initial password is {NIM}@internasional.
+    </p>
+    <form method="post" action="{% url 'dashboard:user_add_student' %}" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="tab" value="{{ tab }}">
+      <div>
+        <label for="add-student-nim" class="block text-sm font-semibold text-gray-700 mb-1">NIM</label>
+        <input id="add-student-nim" name="nim" type="text" maxlength="20" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div class="flex gap-3">
+        <label for="add-student-modal" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+        <button type="submit" class="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Add Student</button>
+      </div>
+    </form>
+  </div>
+  <label class="modal-backdrop" for="add-student-modal"></label>
+</div>
+
+<input type="checkbox" id="upload-csv-modal" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">Upload Students via CSV</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      The first row is a header. The first column must contain the NIM. Students already in the system are updated, and new students are added.
+    </p>
+    <form method="post" action="{% url 'dashboard:user_upload_csv' %}" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="tab" value="{{ tab }}">
+      <input type="file" name="csv_file" accept=".csv,.txt" required
+        class="w-full text-sm text-gray-700 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+      <p class="text-xs text-gray-500">CSV or TXT, max 2 MB.</p>
+      <div class="flex gap-3">
+        <label for="upload-csv-modal" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+        <button type="submit" class="flex-1 py-2 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg">Upload CSV</button>
+      </div>
+    </form>
+  </div>
+  <label class="modal-backdrop" for="upload-csv-modal"></label>
+</div>
+
+<input type="checkbox" id="english-score-modal" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">English Score</h3>
+    <p class="text-sm text-gray-600 mb-4">Enter a whole number from 0 to 100.</p>
+    <form id="english-score-form" method="post" action="" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="tab" id="english-score-tab" value="all">
+      <input type="number" name="english_score" id="english-score-input" min="0" max="100" step="1" required
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      <div class="flex gap-3">
+        <label for="english-score-modal" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+        <button type="submit" class="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Save</button>
+      </div>
+    </form>
+  </div>
+  <label class="modal-backdrop" for="english-score-modal"></label>
+</div>
+
+<input type="checkbox" id="add-staff-modal" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5 max-h-[90vh] overflow-y-auto">
+    <h3 class="text-lg font-bold text-gray-900 mb-1">Add Staff</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      Only admin can create staff accounts. Staff can only manage students in their own study program.
+    </p>
+    <form method="post" action="{% url 'dashboard:user_add_staff' %}" class="space-y-3">
+      {% csrf_token %}
+      <div>
+        <label for="add-staff-username" class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
+        <input id="add-staff-username" name="username" type="text" maxlength="150" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="add-staff-name" class="block text-sm font-semibold text-gray-700 mb-1">Name</label>
+        <input id="add-staff-name" name="name" type="text" maxlength="255" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="add-staff-email" class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+        <input id="add-staff-email" name="email" type="email" maxlength="254" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      <div>
+        <label for="add-staff-password" class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+        <input id="add-staff-password" name="password" type="password" minlength="8" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <p class="text-xs text-gray-500 mt-1">At least 8 characters.</p>
+      </div>
+      <div>
+        <label for="add-staff-program" class="block text-sm font-semibold text-gray-700 mb-1">Study Program</label>
+        <select id="add-staff-program" name="study_program" required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Select study program</option>
+          {% for sp in study_programs %}
+          <option value="{{ sp.pk }}">{{ sp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="flex gap-3 pt-1">
+        <label for="add-staff-modal" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+        <button type="submit" class="flex-1 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg">Add Staff</button>
+      </div>
+    </form>
+  </div>
+  <label class="modal-backdrop" for="add-staff-modal"></label>
+</div>
+
+<script>
+(function () {
+  // Tombol Edit English Score ada di dalam modal detail (dimuat lewat fetch),
+  // jadi memakai delegasi event pada document.
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest(".js-english-score");
+    if (!btn) return;
+    document.getElementById("english-score-form").action = btn.dataset.url;
+    document.getElementById("english-score-input").value = btn.dataset.score;
+    document.getElementById("english-score-tab").value = btn.dataset.tab;
+    document.getElementById("english-score-modal").checked = true;
+  });
+})();
+</script>

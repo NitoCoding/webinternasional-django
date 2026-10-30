@@ -1,0 +1,42 @@
+{% comment %}
+  Modal konfirmasi enroll. Satu modal untuk semua tombol Enroll di halaman, diisi lewat JavaScript.
+  Pola sama dengan modal delete di partials/row_actions.html (checkbox DaisyUI, modal-box max-w-sm p-5).
+{% endcomment %}
+<input type="checkbox" id="enroll-modal" class="modal-toggle hidden" />
+<div class="modal">
+  <div class="modal-box max-w-sm p-5">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-3">
+      <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    </div>
+    <h3 class="text-lg font-bold text-gray-900 text-center mb-2">Confirm Enrollment</h3>
+    <p class="text-sm text-gray-600 text-center">
+      Enroll in <strong id="enroll-modal-name" class="text-gray-900"></strong>?
+      Your request will be sent for approval.
+    </p>
+    <form id="enroll-modal-form" method="post" class="flex gap-3 mt-4">
+      {% csrf_token %}
+      <label for="enroll-modal"
+        class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
+      <button type="submit"
+        class="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Confirm</button>
+    </form>
+  </div>
+  <label class="modal-backdrop" for="enroll-modal"></label>
+</div>
+
+<script>
+(function () {
+  var toggle = document.getElementById("enroll-modal");
+  var form = document.getElementById("enroll-modal-form");
+  var nameEl = document.getElementById("enroll-modal-name");
+  document.querySelectorAll(".js-enroll").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      form.action = btn.dataset.url;
+      nameEl.textContent = btn.dataset.name;
+      toggle.checked = true;
+    });
+  });
+})();
+</script>

@@ -1,0 +1,21 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ title }} - Dashboard{% endblock %}
+{% block heading %}{{ title }}{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+  <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-3">
+    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+    </svg>
+  </div>
+  <p class="text-sm text-gray-700 text-center">{{ message }}</p>
+  {% if detail %}
+  <p class="text-sm font-semibold text-gray-900 text-center mt-2">{{ detail }}</p>
+  {% endif %}
+  <form method="post" action="{{ action_url }}" class="flex gap-3 mt-4">
+    {% csrf_token %}
+    <a href="{{ cancel_url }}" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center">Cancel</a>
+    <button type="submit" class="flex-1 py-2 text-sm text-white font-semibold rounded-lg {{ button_class }}">{{ button }}</button>
+  </form>
+</div>
+{% endblock %}

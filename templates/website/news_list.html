@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}News - International Class{% endblock %}
+{% block hero %}{% include "partials/hero.html" with title=title description=description %}{% endblock %}
+{% block content %}
+<section class="container mx-auto px-6 py-16 grid lg:grid-cols-3 gap-10">
+  <div class="lg:col-span-2 space-y-6">
+    {% for n in page %}
+    <a href="{% url 'website:news_detail' n.pk %}" class="flex flex-col sm:flex-row gap-5 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
+      {% if n.image %}<img src="{{ n.image.url }}" alt="" class="sm:w-64 h-48 object-cover">{% endif %}
+      <div class="p-5">
+        <p class="text-xs text-gray-500">{{ n.publication_date|date:"d F Y" }} &middot; {{ n.views }} views</p>
+        <h2 class="text-xl font-bold text-gray-800 mt-1">{{ n.title }}</h2>
+        <p class="text-gray-600 mt-2 line-clamp-3">{{ n.content|truncatechars:200 }}</p>
+      </div>
+    </a>
+    {% empty %}
+    <p class="text-gray-500">No news yet.</p>
+    {% endfor %}
+    {% include "partials/pagination.html" with page=page %}
+  </div>
+
+  <aside>
+    <h3 class="text-xl font-bold text-gray-800 mb-4">Popular News</h3>
+    <div class="space-y-4">
+      {% for n in popular %}
+      <a href="{% url 'website:news_detail' n.pk %}" class="block bg-white rounded-xl shadow p-4 hover:shadow-lg">
+        <h4 class="font-semibold text-gray-800">{{ n.title }}</h4>
+        <p class="text-xs text-gray-500 mt-1">{{ n.views }} views</p>
+      </a>
+      {% empty %}
+      <p class="text-gray-500">No news yet.</p>
+      {% endfor %}
+    </div>
+  </aside>
+</section>
+{% endblock %}

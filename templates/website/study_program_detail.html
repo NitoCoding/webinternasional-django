@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }} - Study Program{% endblock %}
+{% block content %}
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <div class="flex flex-col leading-none whitespace-nowrap">
+        <div class="flex flex-col justify-center items-start px-16 py-8 w-full bg-blueSecondary max-md:px-5 max-md:max-w-full"
+             data-aos="fade-down">
+            <div class="breadcrumbs text-white">
+                <ul>
+                    <li>
+                        <a href="{% url 'website:study_program_list' %}">Study Programs</a>
+                    </li>
+                    <li>{{ item.name }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <section class="container mx-auto px-4 py-12 max-w-7xl">
+        <div class="space-y-6">
+            <div class="text-center md:text-left" data-aos="fade-right">
+                <h2 class="text-3xl md:text-4xl font-bold text-blueThird mb-2">{{ item.name }}</h2>
+                <div class="flex items-center justify-center md:justify-start space-x-4">
+                    <p class="text-base md:text-lg text-gray-600 uppercase">FACULTY OF {{ item.faculty.name|upper }}</p>
+                    <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-blueSecondary to-blueThird text-white shadow-md">
+                        {{ item.degree }}
+                    </span>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl p-6 md:p-8" data-aos="fade-up">
+                <div class="card-body">
+                    <h3 class="card-title text-xl md:text-2xl text-blueThird">Program Description</h3>
+                    <p class="text-base text-gray-700">{{ item.description }}</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl p-6 md:p-8" data-aos="fade-up">
+                <div class="card-body">
+                    <h3 class="card-title text-xl md:text-2xl text-blueThird">Program Highlights</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <div class="space-y-4">
+                            <div class="flex items-center bg-blue-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-right">
+                                <div class="bg-blueThird text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-blueThird">Outstanding Accreditation</h4>
+                                    <p class="text-xs text-gray-600">
+                                        National Accreditation: {{ item.national_accreditation }} |
+                                        International Accreditation: {{ item.international_accreditation }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-green-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-right"
+                                 data-aos-delay="100">
+                                <div class="bg-green-500 text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-green-700">Academic Environment</h4>
+                                    <p class="text-sm text-gray-600">
+                                        {{ item.classrooms }} classrooms with {{ item.lecturers }} professional
+                                        educators
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-teal-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-right"
+                                 data-aos-delay="200">
+                                <div class="bg-teal-500 text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-teal-700">Program Management</h4>
+                                    <p class="text-xs text-gray-600">
+                                        Program Director: {{ item.director_name|default_if_none:"" }}
+                                        <br>
+                                        Contact: {{ item.director_contact|default_if_none:"" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center bg-purple-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-left">
+                                <div class="bg-purple-500 text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-purple-700">International Exposure</h4>
+                                    <p class="text-sm text-gray-600">{{ item.international_exposure|default_if_none:"" }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-orange-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-left"
+                                 data-aos-delay="100">
+                                <div class="bg-orange-500 text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-orange-700">Tuition Fees</h4>
+                                    <p class="text-sm text-gray-600">
+                                        UKT: IDR {{ ukt_fee }} |
+                                        IPI: IDR {{ ipi_fee }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-yellow-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-left"
+                                 data-aos-delay="200">
+                                <div class="bg-yellow-500 text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-yellow-700">Opening Year</h4>
+                                    <p class="text-sm text-gray-600">{{ item.opening_year|default_if_none:"" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl p-6 md:p-8" data-aos="fade-up">
+                <div class="card-body">
+                    <h3 class="card-title text-xl md:text-2xl text-blueThird">Partnership</h3>
+                    <div class="grid grid-cols-1 gap-6 mt-4">
+                        {% for partnership in partnerships %}
+                            <div class="flex items-center bg-blue-50 p-4 rounded-lg shadow-sm"
+                                 data-aos="fade-up">
+                                <div class="bg-blueThird text-white rounded-full p-3 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-6 w-6"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-blueThird">{{ partnership.title_of_cooperation|default_if_none:"" }}</h4>
+                                    <p class="text-sm text-gray-600">
+                                        <span class="font-semibold">MOU/MOA/IA Number:</span>
+                                        {{ partnership.mou_moa_ia_number|default_if_none:"" }}
+                                        <br>
+                                        <span class="font-semibold">Validity Period:</span>
+                                        {{ partnership.validity_period|default_if_none:"" }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="flex overflow-hidden flex-col py-12 bg-gray-200"
+             data-aos="fade-up">
+        <div class="container mx-auto">
+            <div class="flex flex-col items-start mx-[70px] pt-9 pb-24">
+                <h2 class="self-center text-5xl font-bold text-center text-stone-900 max-md:text-4xl"
+                    data-aos="fade-down"
+                    data-aos-duration="1000">
+                    News and <span class="text-stone-900">Events</span>
+                </h2>
+                <div class="mt-7 w-full max-w-[1246px] max-md:max-w-full">
+                    <div class="flex gap-5 max-md:flex-col">
+                        <div class="flex flex-col w-[56%] max-md:ml-0 max-md:w-full">
+                            <div class="flex flex-col w-full max-md:mt-10 max-md:max-w-full">
+                                <div class="flex flex-wrap gap-6 justify-center items-center text-xs text-black">
+                                    {% for n in news %}
+                                        <article class="flex flex-col self-stretch w-[200px]"
+                                                 data-aos="fade-up"
+                                                 data-aos-delay="200">
+                                            <div class="flex flex-col justify-between pb-1.5 bg-white shadow-[2px_2px_10px_rgba(0,0,0,0.25)] min-h-[400px]">
+                                                {% if n.image %}
+                                                    <img loading="lazy"
+                                                         src="{{ n.image.url }}"
+                                                         alt="News article image"
+                                                         class="object-cover w-full aspect-[1.69]" />
+                                                {% endif %}
+                                                <div class="flex flex-col flex-grow justify-between pr-1.5 pl-2.5">
+                                                    <time datetime="{{ n.publication_date|date:'Y-m-d' }}"
+                                                          class="self-start mt-1 text-xs font-light text-grey-200">
+                                                        {{ n.publication_date|date:"M d, Y" }}
+                                                    </time>
+                                                    <h4 class="mt-3 text-xs font-semibold max-md:mr-1">{{ n.title|truncatechars:80 }}</h4>
+                                                    <p class="mt-2 flex-grow break-words">{{ n.content|striptags|truncatechars:103 }}</p>
+                                                    <a href="{% url 'website:news_detail' n.pk %}"
+                                                       class="self-center px-5 py-2 max-w-full text-center border border-black border-solid hover:bg-indigo-950 hover:text-white w-[150px] max-md:px-10 max-md:mt-5">
+                                                        Read more
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <aside class="flex flex-col ml-5 w-[44%] max-md:ml-0 max-md:w-full">
+                            {% for e in events %}
+                                <a href="{% url 'website:event_detail' e.pk %}"
+                                   class="flex flex-col mb-5 items-start py-8 pr-3.5 pl-7 w-full bg-white rounded-3xl border-indigo-900 border-t-[6px] shadow-[0px_2px_10px_rgba(0,0,0,0.25)] max-md:pl-5 max-md:max-w-full"
+                                   data-aos="fade-left"
+                                   data-aos-delay="200">
+                                    <h4 class="font-semibold">{{ e.title|truncatechars:103 }}</h4>
+                                    <p class="self-stretch mt-1 max-md:max-w-full break-words">{{ e.content|striptags|truncatechars:103 }}</p>
+                                    <div class="flex gap-1.5 mt-4 text-xs text-stone-900">
+                                        <time datetime="{{ e.event_date|date:'Y-m-d' }}">
+                                            {{ e.event_date|date:"d M, Y" }}
+                                        </time>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init();</script>
+{% endblock %}

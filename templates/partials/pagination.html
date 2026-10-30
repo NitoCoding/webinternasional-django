@@ -1,0 +1,7 @@
+{% if page.has_other_pages %}
+<nav class="flex items-center justify-center gap-2 mt-8">
+  {% if page.has_previous %}<a href="?page={{ page.previous_page_number }}" class="px-4 py-2 rounded-lg bg-white shadow hover:bg-redPrimary hover:text-white">&larr; Prev</a>{% endif %}
+  <span class="px-4 py-2 text-gray-600">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a href="?page={{ page.next_page_number }}" class="px-4 py-2 rounded-lg bg-white shadow hover:bg-redPrimary hover:text-white">Next &rarr;</a>{% endif %}
+</nav>
+{% endif %}

@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* Pindai class Tailwind/DaisyUI dari template Django */
+@source "../../templates";
+
+/* Warna merek dari Laravel (tailwind.config.js di layout lama) */
+@theme {
+  --color-redPrimary: #991b1b;
+  --color-redPrimary-500: #ef4444;
+  --color-redPrimary-600: #dc2626;
+  --color-redPrimary-700: #b91c1c;
+  --color-bluePrimary: #1e40af;
+  --color-blueSecondary: #1e3a8a;
+  --color-blueThird: #3730a3;
+}

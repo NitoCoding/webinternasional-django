@@ -1,0 +1,79 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Faculties - Dashboard{% endblock %}
+{% block heading %}Faculties{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto">
+  <!-- Header Actions -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Faculties</h1>
+      <p class="text-gray-600 mt-1">Kelola data fakultas</p>
+    </div>
+    <a href="{{ create_url }}"
+      class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Add Faculty
+    </a>
+  </div>
+
+  <!-- Search Card -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-6">
+    <form method="GET" action="{{ list_url }}" class="flex items-center gap-3">
+      <div class="flex-1 relative">
+        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search faculties..."
+          class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200">
+      </div>
+      <button type="submit"
+        class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        Search
+      </button>
+    </form>
+  </div>
+
+  <!-- Faculties List Card -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    {% for row in rows %}
+    {% if forloop.first %}<div class="divide-y divide-gray-100">{% endif %}
+      <div class="p-5 hover:bg-gray-50 transition-colors duration-200">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex-1">
+            <p class="text-lg font-bold text-gray-900">{{ row.obj.name }}</p>
+            <p class="text-gray-500 text-sm mt-1">{{ row.obj.code|default:"-" }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            {% include "dashboard/partials/row_actions.html" with row=row entity="Faculty" %}
+          </div>
+        </div>
+      </div>
+    {% if forloop.last %}</div>{% endif %}
+    {% empty %}
+      <div class="text-center py-16">
+        <div class="w-20 h-20 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+          <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <p class="text-xl font-bold text-gray-900 mb-2">No Faculties Found</p>
+        <p class="text-gray-500">Start by creating a new faculty</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <nav class="flex items-center justify-center gap-2 mt-6 text-sm">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&search={{ search|urlencode }}" class="px-3 py-1 bg-white rounded shadow">&larr;</a>{% endif %}
+    <span>Halaman {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&search={{ search|urlencode }}" class="px-3 py-1 bg-white rounded shadow">&rarr;</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

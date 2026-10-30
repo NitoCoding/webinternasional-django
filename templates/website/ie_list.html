@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}International Exposure{% endblock %}
+{% block hero %}{% include "partials/hero.html" with title="International Exposure" description=description %}{% endblock %}
+{% block content %}
+<section class="container mx-auto px-6 py-16 space-y-6">
+  {% for p in page %}
+  <a href="{% url 'website:ie_detail' p.pk %}" class="grid md:grid-cols-3 gap-6 bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
+    {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}" class="h-56 md:h-full w-full object-cover">{% endif %}
+    <div class="p-6 md:col-span-2">
+      <span class="inline-block text-xs font-semibold text-white bg-redPrimary rounded-full px-3 py-1">{{ p.ie_program.name }}</span>
+      <h2 class="text-2xl font-bold text-gray-800 mt-3">{{ p.name }}</h2>
+      <p class="text-gray-500 mt-1">{{ p.country }} &middot; {{ p.execution_date|date:"d M Y" }} - {{ p.end_date|date:"d M Y" }}</p>
+      <p class="text-gray-600 mt-3 line-clamp-3">{{ p.description|truncatechars:220 }}</p>
+    </div>
+  </a>
+  {% empty %}
+  <p class="text-gray-500">No programs available yet.</p>
+  {% endfor %}
+  {% include "partials/pagination.html" with page=page %}
+</section>
+{% endblock %}

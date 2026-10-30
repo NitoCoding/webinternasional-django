@@ -1,0 +1,122 @@
+{% load static %}<!doctype html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard - International Class{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-redPrimary: #991b1b;
+      --color-bluePrimary: #1e40af;
+    }
+  </style>
+  <style>
+    /* Sama dengan app-layout.blade.php: modal checkbox DaisyUI untuk konfirmasi hapus */
+    .modal { position: fixed !important; inset: 0 !important; z-index: 999 !important; }
+    .modal-toggle:not(:checked) + .modal { display: none !important; }
+    .modal-toggle:checked + .modal { display: grid !important; }
+  </style>
+</head>
+<body class="min-h-screen bg-blue-50 antialiased">
+{% url 'dashboard:home' as home_url %}
+{% url 'dashboard:users_list' as users_url %}
+{% url 'dashboard:programs_list' as programs_url %}
+{% url 'dashboard:study_programs_list' as study_programs_url %}
+{% url 'dashboard:faculties_list' as faculties_url %}
+{% url 'dashboard:partnerships_list' as degree_url %}
+{% url 'dashboard:events_list' as events_url %}
+{% url 'dashboard:news_list' as news_url %}
+{% url 'dashboard:agendas_list' as agendas_url %}
+{% url 'dashboard:site_settings_list' as settings_url %}
+{% url 'profile' as profile_url %}
+<div class="drawer lg:drawer-open">
+  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+
+  <div class="drawer-content flex flex-col min-h-screen min-w-0">
+    <header class="flex justify-between items-center w-full px-6 py-4 bg-white shadow-sm border-b border-gray-100">
+      <div class="flex items-center gap-4">
+        <label for="my-drawer-2" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </label>
+        <h1 class="text-2xl font-bold text-gray-800">{% block heading %}{% endblock %}</h1>
+      </div>
+
+      <a href="{{ profile_url }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl border shadow-sm hover:shadow-md transition-all duration-300
+        {% if is_student %}bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100 hover:border-blue-200{% else %}bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 hover:border-gray-300{% endif %}">
+        <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold shadow-sm
+          {% if is_student %}bg-gradient-to-br from-blue-500 to-indigo-600{% else %}bg-gradient-to-br from-gray-600 to-gray-700{% endif %}">
+          {{ user.name|default:user.username|slice:":1"|upper }}
+        </div>
+        <div class="hidden sm:block">
+          <p class="text-sm font-semibold text-gray-800">{{ user.name|default:user.username }}</p>
+          <p class="text-xs font-medium {% if is_student %}text-blue-600{% else %}text-gray-600{% endif %}">
+            {% if is_admin %}Admin{% elif is_staff %}Staff{% else %}Student{% endif %}
+          </p>
+        </div>
+      </a>
+    </header>
+
+    <main class="flex-1">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <div class="drawer-side z-40">
+    <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
+    <aside class="flex flex-col bg-white border-r border-gray-200 w-[270px] min-h-screen shadow-lg" aria-label="Main Navigation">
+      <div class="p-6 border-b border-gray-100">
+        <a href="{{ home_url }}" class="text-xl font-bold text-blue-600">International Class</a>
+        <p class="text-xs text-gray-500 mt-1">Dashboard</p>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-4">
+        <ul class="px-4 space-y-2 text-sm">
+          {% if is_admin %}
+          <li>{% include "dashboard/partials/nav_item.html" with url=home_url label="Dashboard" icon="dashboard" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=users_url label="Users" icon="users" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=programs_url label="International Exposure" icon="program" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=faculties_url label="Faculties" icon="program" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=study_programs_url label="Study Programs" icon="program" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=degree_url label="Partnerships" icon="degree" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=events_url label="Event" icon="event" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=news_url label="News" icon="news" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=agendas_url label="Academic Calendar" icon="calendar" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=settings_url label="Site Settings" icon="settings" current=request.path %}</li>
+          {% elif is_staff %}
+          <li>{% include "dashboard/partials/nav_item.html" with url=home_url label="Dashboard" icon="dashboard" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=users_url label="Users" icon="users" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=programs_url label="International Exposure" icon="program" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=news_url label="News" icon="news" current=request.path %}</li>
+          <li>{% include "dashboard/partials/nav_item.html" with url=events_url label="Event" icon="event" current=request.path %}</li>
+          {% else %}
+          <li>{% include "dashboard/partials/nav_item.html" with url=home_url label="Dashboard" icon="dashboard" current=request.path %}</li>
+          {% endif %}
+          {% if is_student %}{% url 'dashboard:student_programs' as student_programs_url %}<li>{% include "dashboard/partials/nav_item.html" with url=student_programs_url label="International Exposure" icon="program" current=request.path %}</li>{% url 'dashboard:student_transcript' as student_transcript_url %}<li>{% include "dashboard/partials/nav_item.html" with url=student_transcript_url label="Transcript" icon="news" current=request.path %}</li><li>{% url 'dashboard:student_study_plan' as student_study_plan_url %}{% include "dashboard/partials/nav_item.html" with url=student_study_plan_url label="Study Plan" icon="program" current=request.path %}</li>{% url 'dashboard:student_calendar' as student_calendar_url %}<li>{% include "dashboard/partials/nav_item.html" with url=student_calendar_url label="Academic Calendar" icon="calendar" current=request.path %}</li>{% endif %}<li>{% include "dashboard/partials/nav_item.html" with url=profile_url label="Profile" icon="profile" current=request.path %}</li>
+        </ul>
+      </div>
+
+      <div class="p-4 border-t border-gray-100 space-y-2">
+        <a href="{% url 'website:home' %}" class="group flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 text-sm">
+          <svg class="w-5 h-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>View website</span>
+        </a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="group flex items-center justify-center gap-2 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 font-medium hover:shadow-sm border border-transparent hover:border-red-100">
+            <svg class="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 32C43 32 0 75 0 128L0 384c0 53 43 96 96 96l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l64 0z"/></svg>
+            <span>Sign Out</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+  </div>
+</div>
+{% include "dashboard/partials/flash_modals.html" %}
+</body>
+</html>

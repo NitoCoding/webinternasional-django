@@ -1,0 +1,135 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Profile - International Class{% endblock %}
+{% block heading %}Profile{% endblock %}
+{% block content %}
+<style>
+  /* Widget dari StyledMixin memakai kelas DaisyUI; CSS ini hanya berlaku di halaman ini. */
+  .compact-form .input, .compact-form .select { height: auto; min-height: 2.5rem; padding: .5rem .75rem; font-size: .875rem; }
+  .compact-form textarea { min-height: 6rem; padding: .5rem .75rem; font-size: .875rem; }
+</style>
+
+<div class="max-w-5xl mx-auto compact-form space-y-4">
+
+  <!-- Header -->
+  <div>
+    <h2 class="font-bold text-xl text-gray-900">Profile</h2>
+    <p class="text-sm text-gray-500">Manage your account information and password</p>
+  </div>
+
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+      <div class="space-y-4">
+        <!-- 1. Account Information -->
+        <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Account Information</h3>
+          <div class="space-y-4">
+            <div>
+              <label for="{{ profile_form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Name {% if profile_form.name.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+              {{ profile_form.name }}
+              {% for err in profile_form.name.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+            </div>
+            <div>
+              <label for="{{ profile_form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Email {% if profile_form.email.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+              {{ profile_form.email }}
+              {% for err in profile_form.email.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+            </div>
+          </div>
+        </section>
+
+        {% if student %}
+        <!-- 2. Student Data -->
+        <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+          <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Student Data</h3>
+
+          <dl class="grid grid-cols-3 gap-4 mb-5">
+            <div>
+              <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Student ID (NIM)</dt>
+              <dd class="text-sm text-gray-900 mt-1">{{ student.student_id_number }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">NIK</dt>
+              <dd class="text-sm text-gray-900 mt-1">{{ student.nik|default:"-" }}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">NISN</dt>
+              <dd class="text-sm text-gray-900 mt-1">{{ student.nisn|default:"-" }}</dd>
+            </div>
+          </dl>
+
+          {% if student_form %}
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="{{ student_form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Mobile Phone {% if student_form.phone_number.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+                {{ student_form.phone_number }}
+                {% for err in student_form.phone_number.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label for="{{ student_form.home_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Home Phone {% if student_form.home_phone.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+                {{ student_form.home_phone }}
+                {% for err in student_form.home_phone.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label for="{{ student_form.birth_place.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Birth Place {% if student_form.birth_place.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+                {{ student_form.birth_place }}
+                {% for err in student_form.birth_place.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+              </div>
+              <div>
+                <label for="{{ student_form.birth_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Birth Date {% if student_form.birth_date.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+                {{ student_form.birth_date }}
+                {% for err in student_form.birth_date.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+              </div>
+            </div>
+            <div>
+              <label for="{{ student_form.address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Address {% if student_form.address.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+              {{ student_form.address }}
+              {% for err in student_form.address.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+            </div>
+            <div>
+              <label for="{{ student_form.postal_code.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Postal Code {% if student_form.postal_code.field.required %}<span class="text-red-500">*</span>{% endif %}</label>
+              {{ student_form.postal_code }}
+              {% for err in student_form.postal_code.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </section>
+        {% endif %}
+      </div>
+
+      <!-- 3. Change Password -->
+      <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 h-fit">
+        <h3 class="text-base font-semibold text-gray-900 pb-2 mb-2 border-b border-gray-100">Change Password</h3>
+        <p class="text-sm text-gray-500 mb-4">Leave these fields blank if you do not want to change your password.</p>
+        <div class="space-y-4">
+          <div>
+            <label for="{{ password_form.old_password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+            {{ password_form.old_password }}
+            {% for err in password_form.old_password.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+          </div>
+          <div>
+            <label for="{{ password_form.new_password1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+            {{ password_form.new_password1 }}
+            {% for err in password_form.new_password1.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+          </div>
+          <div>
+            <label for="{{ password_form.new_password2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+            {{ password_form.new_password2 }}
+            {% for err in password_form.new_password2.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end">
+      <button type="submit"
+              class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

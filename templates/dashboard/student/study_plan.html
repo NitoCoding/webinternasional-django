@@ -1,0 +1,128 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Study Plan - Dashboard{% endblock %}
+{% block heading %}Study Plan (KRS){% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-4">
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">NIM</p>
+      <p class="text-sm text-gray-900 mt-1">{{ nim }}</p>
+    </div>
+    <div>
+      <label for="semester" class="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+      <select id="semester" class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+        {% for s in semesters %}
+        <option value="{{ s.code }}">{{ s.label }}</option>
+        {% empty %}
+        <option value="">No semester available</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div id="krs-notice" class="hidden rounded-lg p-4 text-sm"></div>
+
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-16">No</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Subject</th>
+          <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">SKS</th>
+        </tr>
+      </thead>
+      <tbody id="krs-body" class="divide-y divide-gray-100">
+        <tr><td colspan="3" class="px-4 py-10 text-center text-sm text-gray-500">Loading...</td></tr>
+      </tbody>
+      <tfoot id="krs-foot" class="hidden bg-gray-50 border-t border-gray-200">
+        <tr>
+          <td colspan="2" class="px-4 py-3 text-sm font-semibold text-gray-900">Total SKS</td>
+          <td class="px-4 py-3 text-center">
+            <span id="krs-total" class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-600 text-white">0</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<script>
+(function () {
+  var dataUrl = "{{ data_url }}";
+  var select = document.getElementById("semester");
+  var body = document.getElementById("krs-body");
+  var foot = document.getElementById("krs-foot");
+  var totalEl = document.getElementById("krs-total");
+  var notice = document.getElementById("krs-notice");
+  var requestId = 0; // hanya respons terakhir yang ditampilkan
+
+  function setNotice(text, kind) {
+    notice.textContent = text;
+    notice.className = "rounded-lg p-4 text-sm " + (kind === "error"
+      ? "bg-red-50 border border-red-200 text-red-700"
+      : "bg-yellow-50 border border-yellow-200 text-yellow-800");
+    notice.classList.remove("hidden");
+  }
+  function clearNotice() { notice.classList.add("hidden"); notice.textContent = ""; }
+  function message(text) {
+    body.textContent = "";
+    var tr = document.createElement("tr");
+    var td = document.createElement("td");
+    td.colSpan = 3;
+    td.className = "px-4 py-10 text-center text-sm text-gray-500";
+    td.textContent = text;
+    tr.appendChild(td);
+    body.appendChild(tr);
+    foot.classList.add("hidden");
+  }
+  function renderRows(rows, total) {
+    body.textContent = "";
+    if (!rows.length) { message("No subjects found for this semester."); return; }
+    rows.forEach(function (r, i) {
+      var tr = document.createElement("tr");
+      tr.className = "hover:bg-gray-50";
+      var no = document.createElement("td");
+      no.className = "px-4 py-3 text-sm text-gray-900";
+      no.textContent = String(i + 1);
+      var name = document.createElement("td");
+      name.className = "px-4 py-3 text-sm text-gray-900";
+      name.textContent = r.nama;
+      var sks = document.createElement("td");
+      sks.className = "px-4 py-3 text-sm text-center";
+      var badge = document.createElement("span");
+      badge.className = "px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800";
+      badge.textContent = String(r.sks);
+      sks.appendChild(badge);
+      tr.appendChild(no); tr.appendChild(name); tr.appendChild(sks);
+      body.appendChild(tr);
+    });
+    totalEl.textContent = String(total);
+    foot.classList.remove("hidden");
+  }
+
+  function load(semester) {
+    var id = ++requestId;
+    clearNotice();
+    message("Loading...");
+    var url = new URL(dataUrl, window.location.origin);
+    url.searchParams.set("semester", semester);
+    fetch(url.toString(), { credentials: "same-origin", headers: { Accept: "application/json" } })
+      .then(function (resp) { return resp.json(); })
+      .then(function (json) {
+        if (id !== requestId) return;
+        if (json.message && (!json.ok || json.from_cache)) setNotice(json.message, json.ok ? "warn" : "error");
+        if (json.ok || (json.rows && json.rows.length)) renderRows(json.rows || [], json.total_sks || 0);
+        else message("Could not load the study plan.");
+      })
+      .catch(function () {
+        if (id !== requestId) return;
+        setNotice("Could not load the study plan. Please try again later.", "error");
+        message("No data to show.");
+      });
+  }
+
+  select.addEventListener("change", function () { load(select.value); });
+  if (select.value) { load(select.value); } else { message("No semester available for this NIM."); }
+})();
+</script>
+{% endblock %}

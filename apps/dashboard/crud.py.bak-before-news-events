@@ -1,0 +1,524 @@
+import datetime
+import html
+from dataclasses import dataclass, field
+from typing import Callable, Optional
+
+from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.paginator import Paginator
+from django.db import models
+from django.db.models import ProtectedError
+from django.shortcuts import redirect
+from django.urls import path, reverse, reverse_lazy
+from django.utils.html import strip_tags
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
+
+from . import forms as f
+from apps.academic.models import Faculty, IeProgram, Student, StudyProgram
+from apps.accounts.models import User
+from apps.content.models import Agenda, Event, News
+from apps.international.models import OutboundLecturer, Partnership, Program
+
+
+@dataclass
+class CrudSpec:
+    key: str  # dipakai sebagai path dan prefix nama URL, mis. "study-programs"
+    title: str
+    model: type
+    form: type
+    perm: Optional[str]  # codename permission, mis. "manage_news"
+    columns: list  # field yang ditampilkan di tabel list
+    owner_field: Optional[str] = (
+        None  # field pemilik; staff hanya boleh ubah miliknya sendiri
+    )
+    admin_only: bool = False
+    list_template: str = "dashboard/crud/list.html"
+    search_field: Optional[str] = (
+        None  # field yang dicari lewat ?search= di halaman list
+    )
+    form_template: str = "dashboard/crud/form.html"
+    base_filter: dict = field(
+        default_factory=dict
+    )  # filter tetap untuk daftar, mis. hanya degree program
+    detail_template: str = "dashboard/crud/detail.html"
+    detail_context: Optional[Callable] = (
+        None  # (obj, request) -> dict konteks tambahan untuk halaman detail
+    )
+    list_filter: Optional[Callable] = (
+        None  # (qs, request) -> (qs, dict konteks): filter dropdown di halaman list
+    )
+    url_name: str = field(init=False)
+
+    def __post_init__(self):
+        self.url_name = self.key.replace("-", "_")
+
+
+def _str_limit(text, limit, end="..."):
+    """Pengganti Str::limit(html_entity_decode(strip_tags($text)), $limit, $end) di Laravel."""
+    clean = html.unescape(strip_tags(text or ""))
+    return clean[:limit] + end if len(clean) > limit else clean
+
+
+def _program_detail_context(obj, request):
+    accepted = (
+        obj.enrollments.select_related("student")
+        .filter(status="approved")
+        .order_by("-pk")
+    )
+    pending = (
+        obj.enrollments.select_related("student")
+        .filter(status="pending")
+        .order_by("created_at")
+    )
+    return {
+        "accepted_page": Paginator(accepted, 10).get_page(request.GET.get("page")),
+        "pending_enrollments": pending,
+        "description_excerpt": _str_limit(obj.description, 150),
+    }
+
+
+def _program_list_filter(qs, request):
+    """Filter dropdown halaman list Programs: IE Program, Country, dan status waktu."""
+    today = datetime.date.today()
+    ie_id = request.GET.get("ie_program", "").strip()
+    country = request.GET.get("country", "").strip()
+    status = request.GET.get("status", "").strip()
+
+    if ie_id.isdigit():
+        qs = qs.filter(ie_program_id=int(ie_id))
+    if country:
+        qs = qs.filter(country=country)
+    if status == "upcoming":
+        qs = qs.filter(execution_date__gt=today)
+    elif status == "ongoing":
+        qs = qs.filter(execution_date__lte=today, end_date__gte=today)
+    elif status == "finished":
+        qs = qs.filter(end_date__lt=today)
+    else:
+        status = ""
+
+    countries = (
+        Program.objects.exclude(country="")
+        .order_by("country")
+        .values_list("country", flat=True)
+        .distinct()
+    )
+    return qs, {
+        "ie_programs": IeProgram.objects.order_by("name"),
+        "countries": countries,
+        "status_choices": [
+            ("upcoming", "Upcoming"),
+            ("ongoing", "Ongoing"),
+            ("finished", "Finished"),
+        ],
+        "selected": {"ie_program": ie_id, "country": country, "status": status},
+    }
+
+
+def _study_program_list_filter(qs, request):
+    """Filter dropdown halaman list Study Programs: Faculty."""
+    faculty_id = request.GET.get("faculty", "").strip()
+    if faculty_id.isdigit():
+        qs = qs.filter(faculty_id=int(faculty_id))
+    else:
+        faculty_id = ""
+    return qs, {
+        "faculties": Faculty.objects.order_by("name"),
+        "selected": {"faculty": faculty_id},
+    }
+
+
+def _partnership_list_filter(qs, request):
+    """Filter dropdown halaman list Partnerships: Type, Status, dan Country."""
+    allowed_types = ("double_degree", "joint_degree")
+    ptype = request.GET.get("type", "").strip()
+    status = request.GET.get("status", "").strip()
+    country = request.GET.get("country", "").strip()
+
+    if ptype in allowed_types:
+        qs = qs.filter(partnership_type=ptype)
+    else:
+        ptype = ""
+    if status == "active":
+        qs = qs.filter(is_active=True)
+    elif status == "inactive":
+        qs = qs.filter(is_active=False)
+    else:
+        status = ""
+    if country:
+        qs = qs.filter(country=country)
+
+    countries = (
+        Partnership.objects.filter(partnership_type__in=allowed_types)
+        .exclude(country__isnull=True)
+        .exclude(country="")
+        .order_by("country")
+        .values_list("country", flat=True)
+        .distinct()
+    )
+    return qs, {
+        "type_choices": [("double_degree", "Double Degree"), ("joint_degree", "Joint Degree")],
+        "status_choices": [("active", "Active"), ("inactive", "Inactive")],
+        "countries": countries,
+        "selected": {"type": ptype, "status": status, "country": country},
+    }
+
+
+def _study_program_detail_context(obj, request):
+    return {
+        # number_format($x, 0, ',', '.') di Laravel: tanpa desimal
+        "ukt_fee": f"{int(obj.ukt_fee or 0):,}".replace(",", "."),
+        "ipi_fee": f"{int(obj.ipi_fee or 0):,}".replace(",", "."),
+        "partnerships": obj.partnerships.all(),
+        "outbound_lecturers": obj.outbound_lecturers.all(),
+    }
+
+
+CRUD_SPECS = [
+    CrudSpec(
+        "news",
+        "News",
+        News,
+        f.NewsForm,
+        "manage_news",
+        ["title", "study_program", "publication_date", "views"],
+        owner_field="user",
+    ),
+    CrudSpec(
+        "events",
+        "Events",
+        Event,
+        f.EventForm,
+        "manage_event",
+        ["title", "study_program", "event_date"],
+        owner_field="user",
+    ),
+    CrudSpec(
+        "agendas",
+        "Agenda",
+        Agenda,
+        f.AgendaForm,
+        "manage_event",
+        ["title", "start", "end"],
+    ),
+    CrudSpec(
+        "study-programs",
+        "Study Programs",
+        StudyProgram,
+        f.StudyProgramForm,
+        "manage_program",
+        ["name", "faculty", "degree"],
+        list_template="dashboard/study_programs/list.html",
+        form_template="dashboard/study_programs/form.html",
+        detail_template="dashboard/study_programs/detail.html",
+        detail_context=_study_program_detail_context,
+        list_filter=_study_program_list_filter,
+        search_field="name",
+    ),
+    CrudSpec(
+        "faculties",
+        "Faculties",
+        Faculty,
+        f.FacultyForm,
+        "manage_program",
+        ["name", "code"],
+        list_template="dashboard/faculties/list.html",
+        form_template="dashboard/faculties/form.html",
+        detail_template="dashboard/faculties/detail.html",
+        search_field="name",
+    ),
+    CrudSpec(
+        "ie-programs",
+        "IE Programs",
+        IeProgram,
+        f.IeProgramForm,
+        "manage_program",
+        ["name"],
+    ),
+    CrudSpec(
+        "programs",
+        "Program",
+        Program,
+        f.ProgramForm,
+        "manage_program",
+        ["name", "country", "execution_date", "participants_count"],
+        owner_field="created_by",
+        list_template="dashboard/programs/list.html",
+        form_template="dashboard/programs/form.html",
+        search_field="name",
+        detail_template="dashboard/programs/detail.html",
+        detail_context=_program_detail_context,
+        list_filter=_program_list_filter,
+    ),
+    CrudSpec(
+        "partnerships",
+        "Degree Program",
+        Partnership,
+        f.PartnershipForm,
+        "manage_program",
+        ["partner_university", "partnership_type", "country", "is_active"],
+        list_template="dashboard/partnerships/list.html",
+        form_template="dashboard/partnerships/form.html",
+        detail_template="dashboard/partnerships/detail.html",
+        list_filter=_partnership_list_filter,
+        search_field="partner_university",
+        base_filter={"partnership_type__in": ["double_degree", "joint_degree"]},
+    ),
+    CrudSpec(
+        "outbound-lecturers",
+        "Outbound Lecturers",
+        OutboundLecturer,
+        f.OutboundLecturerForm,
+        "manage_program",
+        ["lecturer_name", "university_name", "activity_year"],
+    ),
+    CrudSpec(
+        "users",
+        "Users",
+        User,
+        f.UserForm,
+        "manage_user",
+        ["username", "name", "email", "is_active"],
+    ),
+    CrudSpec(
+        "students",
+        "Students",
+        Student,
+        f.StudentForm,
+        "manage_user",
+        ["student_id_number", "name", "study_program", "status"],
+    ),
+]
+
+
+def _is_admin(user):
+    return user.is_superuser or user.has_role("admin")
+
+
+class RoleAccessMixin(PermissionRequiredMixin):
+    """Akses berdasarkan permission; admin_only membatasi ke role admin."""
+
+    spec: CrudSpec = None
+
+    def has_permission(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
+        if _is_admin(user):
+            return True
+        if self.spec.admin_only:
+            return False
+        return user.has_perm(f"accounts.{self.spec.perm}")
+
+
+class OwnerScopeMixin:
+    """Staff (non-admin) hanya bisa mengubah/menghapus data miliknya sendiri."""
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        owner = self.spec.owner_field
+        if owner and not _is_admin(self.request.user):
+            qs = qs.filter(**{owner: self.request.user})
+        return qs
+
+
+def _cell(obj, name):
+    getter = getattr(obj, f"get_{name}_display", None)
+    return getter() if getter else getattr(obj, name)
+
+
+DETAIL_HIDDEN_FIELDS = {"id", "created_at", "updated_at", "password"}
+
+
+def _detail_fields(obj):
+    """Pasangan (label, nilai) untuk halaman detail; field gambar/berkas ditangani terpisah."""
+    fields = []
+    for fld in obj._meta.concrete_fields:
+        if fld.name in DETAIL_HIDDEN_FIELDS or isinstance(
+            fld, (models.ImageField, models.FileField)
+        ):
+            continue
+        value = _cell(obj, fld.name)
+        if isinstance(value, bool):
+            value = "Yes" if value else "No"
+        fields.append(
+            {
+                "label": fld.verbose_name.capitalize(),
+                "value": value if value not in (None, "") else "-",
+                "long": isinstance(fld, models.TextField),
+            }
+        )
+    return fields
+
+
+def build_views(spec: CrudSpec):
+    base_ctx = {
+        "spec": spec,
+        "list_url": reverse_lazy(f"dashboard:{spec.url_name}_list"),
+    }
+
+    class ListV(RoleAccessMixin, ListView):
+        paginate_by = 20
+        permission_required = None
+
+        def get_template_names(self):
+            return [self.spec.list_template]
+
+        def get_queryset(self):
+            qs = self.spec.model.objects.filter(**self.spec.base_filter).order_by("-pk")
+            search = self.request.GET.get("search", "").strip()
+            if self.spec.search_field and search:
+                qs = qs.filter(**{f"{self.spec.search_field}__icontains": search})
+            self.extra_ctx = {}
+            if self.spec.list_filter:
+                qs, self.extra_ctx = self.spec.list_filter(qs, self.request)
+            return qs
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx.update(base_ctx)
+            ctx.update(getattr(self, "extra_ctx", {}))
+            ctx["search"] = self.request.GET.get("search", "")
+            query = self.request.GET.copy()
+            query.pop("page", None)
+            ctx["filter_qs"] = query.urlencode()
+            ctx["has_filters"] = any(v for v in query.values())
+            n = self.spec.url_name
+            ctx["list_url"] = reverse(f"dashboard:{n}_list")
+            ctx["create_url"] = reverse(f"dashboard:{n}_create")
+            ctx["rows"] = [
+                {
+                    "obj": o,
+                    "cells": [_cell(o, c) for c in spec.columns],
+                    "detail_url": reverse(f"dashboard:{n}_detail", args=[o.pk]),
+                    "edit_url": reverse(f"dashboard:{n}_update", args=[o.pk]),
+                    "delete_url": reverse(f"dashboard:{n}_delete", args=[o.pk]),
+                }
+                for o in ctx["object_list"]
+            ]
+            ctx["headers"] = [
+                self.spec.model._meta.get_field(c).verbose_name.capitalize()
+                for c in spec.columns
+            ]
+            ctx["is_admin"] = _is_admin(self.request.user)
+            return ctx
+
+    class CreateV(RoleAccessMixin, CreateView):
+        permission_required = None
+
+        def get_template_names(self):
+            return [self.spec.form_template]
+
+        def get_form_class(self):
+            return self.spec.form
+
+        def get_success_url(self):
+            return reverse_lazy(f"dashboard:{self.spec.url_name}_list")
+
+        def form_valid(self, form):
+            if self.spec.owner_field:
+                setattr(form.instance, self.spec.owner_field, self.request.user)
+            messages.success(
+                self.request, f"{self.spec.title}: record added successfully."
+            )
+            return super().form_valid(form)
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx.update(base_ctx, action="New")
+            return ctx
+
+    class UpdateV(RoleAccessMixin, OwnerScopeMixin, UpdateView):
+        permission_required = None
+
+        def get_template_names(self):
+            return [self.spec.form_template]
+
+        def get_form_class(self):
+            return self.spec.form
+
+        def get_success_url(self):
+            return reverse_lazy(f"dashboard:{self.spec.url_name}_list")
+
+        def form_valid(self, form):
+            messages.success(self.request, f"{self.spec.title}: changes saved.")
+            return super().form_valid(form)
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx.update(base_ctx, action="Edit")
+            return ctx
+
+    class DetailV(RoleAccessMixin, OwnerScopeMixin, DetailView):
+        permission_required = None
+
+        def get_template_names(self):
+            return [self.spec.detail_template]
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            obj = ctx["object"]
+            image = getattr(obj, "image", None)
+            ctx.update(base_ctx)
+            if self.spec.detail_context:
+                ctx.update(self.spec.detail_context(obj, self.request))
+            ctx["edit_url"] = reverse(
+                f"dashboard:{self.spec.url_name}_update", args=[obj.pk]
+            )
+            ctx["fields"] = _detail_fields(obj)
+            ctx["has_image"] = hasattr(obj, "image")
+            ctx["image_url"] = image.url if image else None
+            ctx["title"] = str(obj)
+            return ctx
+
+    class DeleteV(RoleAccessMixin, OwnerScopeMixin, DeleteView):
+        template_name = "dashboard/crud/confirm_delete.html"
+        permission_required = None
+
+        def get_success_url(self):
+            return reverse_lazy(f"dashboard:{self.spec.url_name}_list")
+
+        def form_valid(self, form):
+            try:
+                response = super().form_valid(form)
+            except ProtectedError:
+                messages.error(
+                    self.request,
+                    f"{self.spec.title} cannot be deleted because other records still use it.",
+                )
+                return redirect(self.get_success_url())
+            messages.success(self.request, f"{self.spec.title}: record deleted.")
+            return response
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx.update(base_ctx)
+            return ctx
+
+    for cls in (ListV, CreateV, UpdateV, DetailV, DeleteV):
+        cls.spec = spec
+        cls.model = spec.model
+
+    return ListV, CreateV, UpdateV, DetailV, DeleteV
+
+
+def crud_urlpatterns():
+    patterns = []
+    for spec in CRUD_SPECS:
+        list_v, create_v, update_v, detail_v, delete_v = build_views(spec)
+        base = spec.key
+        n = spec.url_name
+        patterns += [
+            path(f"{base}/", list_v.as_view(), name=f"{n}_list"),
+            path(f"{base}/new/", create_v.as_view(), name=f"{n}_create"),
+            path(f"{base}/<int:pk>/", detail_v.as_view(), name=f"{n}_detail"),
+            path(f"{base}/<int:pk>/edit/", update_v.as_view(), name=f"{n}_update"),
+            path(f"{base}/<int:pk>/delete/", delete_v.as_view(), name=f"{n}_delete"),
+        ]
+    return patterns

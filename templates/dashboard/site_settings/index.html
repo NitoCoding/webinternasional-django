@@ -1,0 +1,141 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Site Settings - Dashboard{% endblock %}
+{% block heading %}Site Settings{% endblock %}
+{% block content %}
+<style>
+  /* Form ini memakai input Tailwind biasa; CSS ini hanya menyamakan ukuran textarea dan teks. */
+  .compact-form textarea { font-size: .875rem; }
+</style>
+
+<div class="max-w-5xl mx-auto compact-form space-y-4">
+
+  <!-- Header -->
+  <div>
+    <h2 class="font-bold text-xl text-gray-900">Site Settings</h2>
+    <p class="text-sm text-gray-500">Manage landing page content</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <!-- 1. About Section -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">About Section</h3>
+      <div class="space-y-4">
+        <div>
+          <label for="{{ form.about_title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+          {{ form.about_title }}
+          {% for err in form.about_title.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.about_paragraph_1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">First Paragraph</label>
+          {{ form.about_paragraph_1 }}
+          {% for err in form.about_paragraph_1.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.about_paragraph_2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Second Paragraph</label>
+          {{ form.about_paragraph_2 }}
+          {% for err in form.about_paragraph_2.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.about_image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">About Image</label>
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+              <img src="{{ image_url }}" alt="Current image" id="imagePreview"
+                class="w-40 h-28 object-cover rounded-lg border border-gray-200">
+              <p class="text-xs text-gray-500 mt-1" id="previewLabel">Current image</p>
+            </div>
+            <div class="flex-1">
+              <div class="px-4 py-3 bg-white border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                {{ form.about_image }}
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Leave empty to keep the current image. Max 2MB (JPEG, PNG, GIF, WebP).</p>
+              <p class="text-red-500 text-sm mt-1 hidden" id="imageSizeError">Image is too large! Maximum 2MB.</p>
+              {% for err in form.about_image.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. International Exposure Program Cards -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">International Exposure Program Cards</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for i, title_field, desc_field in form.ie_cards %}
+        <div class="rounded-lg border border-gray-200 p-4 space-y-3">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Card {{ i }}</p>
+          <div>
+            <label for="{{ title_field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            {{ title_field }}
+            {% for err in title_field.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+          </div>
+          <div>
+            <label for="{{ desc_field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            {{ desc_field }}
+            {% for err in desc_field.errors %}<p class="text-red-500 text-xs mt-1">{{ err }}</p>{% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- 3. Footer Contact -->
+    <section class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h3 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Footer Contact Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label for="{{ form.footer_address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          {{ form.footer_address }}
+          {% for err in form.footer_address.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.footer_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          {{ form.footer_phone }}
+          {% for err in form.footer_phone.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.footer_email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          {{ form.footer_email }}
+          {% for err in form.footer_email.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <a href="{% url 'dashboard:home' %}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors">Cancel</a>
+      <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">Save Settings</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const previewLabel = document.getElementById('previewLabel');
+    const sizeError = document.getElementById('imageSizeError');
+
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const maxSize = 2 * 1024 * 1024; // 2MB
+
+      if (file.size > maxSize) {
+        sizeError.classList.remove('hidden');
+        input.value = '';
+        return;
+      }
+      sizeError.classList.add('hidden');
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        previewLabel.textContent = 'New image preview';
+        previewLabel.classList.add('text-blue-600', 'font-medium');
+        previewLabel.classList.remove('text-gray-500');
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }} - International Exposure{% endblock %}
+{% block content %}
+<article class="container mx-auto px-6 py-12 max-w-4xl">
+  <a href="{% url 'website:ie_list' %}" class="text-redPrimary hover:underline">&larr; Back to International Exposure</a>
+  <span class="block mt-6 inline-block w-max text-xs font-semibold text-white bg-redPrimary rounded-full px-3 py-1">{{ item.ie_program.name }}</span>
+  <h1 class="text-4xl font-bold text-gray-800 mt-3">{{ item.name }}</h1>
+  <p class="text-gray-500 mt-2">{{ item.country }} &middot; {{ item.execution_date|date:"d M Y" }} - {{ item.end_date|date:"d M Y" }}</p>
+  {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full rounded-2xl shadow-lg my-8">{% endif %}
+  <div class="grid grid-cols-2 gap-4 my-6">
+    <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Participants</p><p class="font-semibold">{{ item.participants_count }}</p></div>
+    <div class="bg-white rounded-xl shadow p-4"><p class="text-xs text-gray-500">Course credits</p><p class="font-semibold">{{ item.course_credits }}</p></div>
+  </div>
+  <div class="text-gray-700 leading-relaxed whitespace-pre-line">{{ item.description }}</div>
+  {% if item.brochure_pdf %}
+  <a href="{{ item.brochure_pdf.url }}" class="inline-block mt-8 px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold">Download brochure</a>
+  {% endif %}
+</article>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ spec.title }} - Dashboard{% endblock %}
+{% block heading %}{{ spec.title }}{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <p class="text-sm text-gray-500">{{ page_obj.paginator.count|default:0 }} data</p>
+  <a href="{{ create_url }}" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">+ Add</a>
+</div>
+
+<div class="bg-white rounded-xl shadow overflow-x-auto">
+  <table class="table">
+    <thead>
+      <tr>
+        {% for h in headers %}<th>{{ h }}</th>{% endfor %}
+        <th class="text-right">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for c in row.cells %}<td>{{ c|default_if_none:"-" }}</td>{% endfor %}
+        <td class="text-right whitespace-nowrap">
+          <a href="{{ row.edit_url }}" class="btn btn-sm btn-outline">Edit</a>
+          <a href="{{ row.delete_url }}" class="btn btn-sm btn-error btn-outline">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="{{ headers|length|add:1 }}" class="text-center text-gray-500 py-8">No data yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<nav class="flex items-center justify-center gap-2 mt-6 text-sm">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-white rounded shadow">&larr;</a>{% endif %}
+  <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-white rounded shadow">&rarr;</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "dashboard/crud/list_shell.html" %}
+{% block page_title %}Faculties{% endblock %}
+{% block page_subtitle %}Manage faculties{% endblock %}
+{% block add_label %}Add Faculty{% endblock %}
+{% block search_placeholder %}Search faculties by name...{% endblock %}
+{% block list_rows %}
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Faculty</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Code</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for row in rows %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3">
+            <a href="{{ row.detail_url }}" class="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">{{ row.obj.name }}</a>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ row.obj.code|default:"-" }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-2">
+              {% include "dashboard/partials/row_actions.html" with row=row entity="Faculty" %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+{% block empty_title %}No Faculties Found{% endblock %}
+{% block empty_hint %}Start by creating a new faculty.{% endblock %}

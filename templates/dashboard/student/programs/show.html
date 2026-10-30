@@ -1,0 +1,93 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ program.name }} - Dashboard{% endblock %}
+{% block heading %}International Exposure{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-4">
+
+  <div class="flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <a href="{{ back_url }}" title="Back" aria-label="Back"
+        class="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </a>
+      <div>
+        <h1 class="text-xl font-bold text-gray-900">{{ program.name }}</h1>
+        <p class="text-sm text-gray-500">{{ program.country }} &middot; {{ program.ie_program.name|default:"No type" }}</p>
+      </div>
+    </div>
+    {% if can_enroll %}
+    <button type="button" class="js-enroll px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+      data-url="{{ enroll_url }}" data-name="{{ program.name }}">Enroll</button>
+    {% endif %}
+  </div>
+
+  {% include "dashboard/student/programs/_banner.html" %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h2 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Schedule</h2>
+      <dl class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Start date</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ program.execution_date|date:"d M Y" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide">End date</dt>
+          <dd class="text-sm text-gray-900 mt-1">{{ program.end_date|date:"d M Y" }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h2 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Credits and participants</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-lg border border-gray-200 p-3">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Course credits</p>
+          <p class="text-xl font-bold text-blue-600 mt-1">{{ program.course_credits }} <span class="text-sm font-normal text-gray-500">SKS</span></p>
+        </div>
+        <div class="rounded-lg border border-gray-200 p-3">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Participants</p>
+          {% if full %}
+            <p class="text-xl font-bold text-red-600 mt-1">Full</p>
+          {% else %}
+            <p class="text-xl font-bold text-blue-600 mt-1">{{ approved }} <span class="text-sm font-normal text-gray-500">/ {{ program.participants_count }}</span></p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 lg:col-span-2">
+      <h2 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Description</h2>
+      <p class="text-sm text-gray-900 whitespace-pre-line">{{ program.description }}</p>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h2 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Study programs</h2>
+      <div class="flex flex-wrap gap-2">
+        {% for sp in study_programs %}
+          <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">{{ sp.name }}</span>
+        {% empty %}
+          <p class="text-sm text-gray-500">No study program associated.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+      <h2 class="text-base font-semibold text-gray-900 pb-2 mb-4 border-b border-gray-100">Your enrollment</h2>
+      {% if status == "approved" %}
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Approved</span>
+        <p class="text-sm text-gray-600 mt-2">Record your activities and upload your certificate.</p>
+        <a href="{% url 'dashboard:student_logbook_list' program.pk %}"
+          class="inline-block mt-3 px-3 py-2 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white">Open Logbook</a>
+      {% elif status == "pending" %}
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Waiting for approval</span>
+      {% else %}
+        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">Not enrolled</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% include "dashboard/student/programs/_enroll_dialog.html" %}
+{% endblock %}

@@ -1,0 +1,89 @@
+{% load static %}
+<header>
+  <div class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6">
+      <div class="flex items-center justify-between h-20">
+        <a href="{% url 'website:home' %}" class="flex items-center gap-3 group">
+          <img src="{% static 'images/logoUnhas.png' %}" alt="Logo" class="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110">
+          <div class="border-l-2 border-gray-300 h-10"></div>
+          <div class="flex flex-col">
+            <span class="font-bold text-gray-800 text-sm leading-tight group-hover:text-redPrimary">International Class</span>
+            <span class="text-xs text-gray-600 group-hover:text-redPrimary">Hasanuddin University</span>
+          </div>
+        </a>
+
+        <!-- Navigasi desktop -->
+        <nav class="hidden lg:flex items-center space-x-1">
+          <a href="{% url 'website:about' %}" class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium">About</a>
+          <a href="{% url 'website:degree_list' %}" class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium">Double / Joint Degree</a>
+
+          <div class="relative group">
+            <button class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium flex items-center gap-1">IUP Program</button>
+            <div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100">
+              <div class="p-2">
+                <a href="{% url 'website:study_program_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
+                  <div class="font-semibold">Study Program</div>
+                  <div class="text-xs opacity-75">Explore our academic programs</div>
+                </a>
+                <a href="{% url 'website:ie_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
+                  <div class="font-semibold">International Exposure</div>
+                  <div class="text-xs opacity-75">Global opportunities</div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative group">
+            <button class="px-4 py-2 text-gray-700 hover:text-redPrimary font-medium flex items-center gap-1">Information</button>
+            <div class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-100">
+              <div class="p-2">
+                <a href="{% url 'website:news_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
+                  <div class="font-semibold">News</div>
+                  <div class="text-xs opacity-75">Latest updates</div>
+                </a>
+                <a href="{% url 'website:event_list' %}" class="block px-4 py-3 text-gray-700 hover:bg-redPrimary hover:text-white rounded-lg">
+                  <div class="font-semibold">Events</div>
+                  <div class="text-xs opacity-75">Upcoming activities</div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <div class="hidden lg:flex items-center">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard:home' %}" class="px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold hover:bg-redPrimary/90">Dashboard</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="px-6 py-2.5 text-redPrimary border-2 border-redPrimary rounded-full font-semibold hover:bg-redPrimary hover:text-white transition-all duration-300">Login</a>
+          {% if allow_register %}
+          <a href="{% url 'register' %}" class="ml-2 px-6 py-2.5 text-white bg-redPrimary rounded-full font-semibold hover:bg-redPrimary/90">Register</a>
+          {% endif %}
+          {% endif %}
+        </div>
+
+        <!-- Menu mobile -->
+        <details class="lg:hidden relative">
+          <summary class="p-3 text-gray-700 hover:text-redPrimary hover:bg-gray-100 rounded-lg cursor-pointer list-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </summary>
+          <nav class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-3 space-y-1">
+            <a href="{% url 'website:about' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">About</a>
+            <a href="{% url 'website:degree_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">Double / Joint Degree</a>
+            <a href="{% url 'website:study_program_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">Study Program</a>
+            <a href="{% url 'website:ie_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">International Exposure</a>
+            <a href="{% url 'website:news_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">News</a>
+            <a href="{% url 'website:event_list' %}" class="block px-4 py-2 hover:bg-redPrimary hover:text-white rounded-lg">Events</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard:home' %}" class="block px-4 py-2 mt-2 text-center text-white bg-redPrimary rounded-lg font-semibold">Dashboard</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="block px-4 py-2 mt-2 text-center text-white bg-redPrimary rounded-lg font-semibold">Login</a>
+            {% if allow_register %}
+            <a href="{% url 'register' %}" class="block px-4 py-2 mt-2 text-center text-redPrimary border-2 border-redPrimary rounded-lg font-semibold">Register</a>
+            {% endif %}
+            {% endif %}
+          </nav>
+        </details>
+      </div>
+    </div>
+  </div>
+</header>

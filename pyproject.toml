@@ -1,0 +1,15 @@
+[project]
+name = "international-django"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "deep-translator>=1.11.4",
+    "django==5.2.18",
+    "django-environ>=0.14.0",
+    "httpx>=0.28.1",
+    "mysqlclient>=2.3.0",
+    "openpyxl>=3.1.5",
+    "pillow>=13.0.0",
+    "tenacity>=9.2.1",
+    "whitenoise>=6.12.0",
+]

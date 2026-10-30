@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Double / Joint Degree{% endblock %}
+{% block hero %}{% include "partials/hero.html" with title="Double / Joint Degree" description="Partnership programs with prestigious international universities offering dual qualifications and global academic experience." %}{% endblock %}
+{% block content %}
+<section class="container mx-auto px-6 py-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for it in items %}
+  <a href="{% url 'website:degree_detail' it.pk %}" class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
+    {% if it.image %}<img src="{{ it.image.url }}" alt="" class="h-44 w-full object-cover">{% endif %}
+    <div class="p-5">
+      <span class="inline-block text-xs font-semibold text-white bg-bluePrimary rounded-full px-3 py-1">{{ it.get_partnership_type_display }}</span>
+      <h2 class="font-bold text-gray-800 mt-3">{{ it.partner_university|default:"-" }}</h2>
+      <p class="text-sm text-gray-500">{{ it.country|default:"" }}</p>
+      <p class="text-sm text-gray-600 mt-2">{{ it.title_of_cooperation|default:"" }}</p>
+    </div>
+  </a>
+  {% empty %}
+  <p class="text-gray-500">No degree programs yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}

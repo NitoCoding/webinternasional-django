@@ -1,0 +1,61 @@
+from django.contrib import messages
+from django.contrib.auth import login, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+
+from apps.academic.models import Student
+
+from .context_processors import is_registration_open
+from .forms import ChangePasswordForm, ProfileForm, RegisterForm, StudentProfileForm
+
+
+def register(request):
+    if not is_registration_open():
+        messages.error(request, "Pendaftaran akun sedang ditutup.")
+        return redirect("login")
+
+    form = RegisterForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+        login(request, user)
+        return redirect("dashboard:home")
+    return render(request, "registration/register.html", {"form": form})
+
+
+@login_required
+def profile(request):
+    user = request.user
+    student = Student.objects.filter(user=user).first()
+
+    profile_form = ProfileForm(request.POST or None, instance=user)
+    student_form = StudentProfileForm(request.POST or None, instance=student) if student else None
+
+    # Sama seperti Laravel: password hanya diproses jika kolom password baru diisi.
+    change_password = request.method == "POST" and bool(request.POST.get("new_password1"))
+    password_form = ChangePasswordForm(user, request.POST) if change_password else None
+
+    if request.method == "POST":
+        valid = all([
+            profile_form.is_valid(),
+            student_form.is_valid() if student_form else True,
+            password_form.is_valid() if password_form else True,
+        ])
+        if valid:
+            profile_form.save()
+            if student_form:
+                student = student_form.save(commit=False)
+                student.name = user.name
+                student.email = user.email
+                student.save()
+            if password_form:
+                password_form.save()
+                update_session_auth_hash(request, user)
+            messages.success(request, "Profil berhasil diperbarui.")
+            return redirect("profile")
+
+    return render(request, "profile/edit.html", {
+        "profile_form": profile_form,
+        "student": student,
+        "student_form": student_form,
+        "password_form": ChangePasswordForm(user) if password_form is None else password_form,
+    })

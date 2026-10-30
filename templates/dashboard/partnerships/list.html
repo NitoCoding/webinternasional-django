@@ -1,0 +1,84 @@
+{% extends "dashboard/crud/list_shell.html" %}
+{% block page_title %}Partnerships{% endblock %}
+{% block page_subtitle %}Manage Double and Joint Degree partnerships{% endblock %}
+{% block add_label %}Add Degree Program{% endblock %}
+{% block search_placeholder %}Search partnerships by university name...{% endblock %}
+{% block list_filters %}
+  <select name="type" onchange="this.form.submit()"
+    class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+    <option value="">All Types</option>
+    {% for value, label in type_choices %}
+      <option value="{{ value }}" {% if selected.type == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="status" onchange="this.form.submit()"
+    class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+    <option value="">All Statuses</option>
+    {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if selected.status == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="country" onchange="this.form.submit()"
+    class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+    <option value="">All Countries</option>
+    {% for c in countries %}
+      <option value="{{ c }}" {% if selected.country == c %}selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+  </select>
+{% endblock %}
+{% block list_rows %}
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Partner University</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Programs</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for row in rows %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg flex-shrink-0">
+                {{ row.obj.flag_emoji|default:"🌍" }}
+              </div>
+              <div>
+                <a href="{{ row.detail_url }}" class="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">{{ row.obj.partner_university }}</a>
+                <p class="text-xs text-gray-500">{{ row.obj.country|default:"-" }}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold
+              {% if row.obj.partnership_type == 'double_degree' %}bg-yellow-100 text-yellow-800{% elif row.obj.partnership_type == 'joint_degree' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+              {{ row.obj.get_partnership_type_display }}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <p class="text-sm text-gray-900">{{ row.obj.unhas_program|default:"-" }}</p>
+            <p class="text-xs text-gray-500">{{ row.obj.partner_program|default:"" }}</p>
+          </td>
+          <td class="px-4 py-3">
+            {% if row.obj.is_active %}
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">Active</span>
+            {% else %}
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Inactive</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-2">
+              {% include "dashboard/partials/row_actions.html" with row=row entity="Partnership" %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+{% block empty_title %}No Partnerships Found{% endblock %}
+{% block empty_hint %}Start by creating a new degree program partnership.{% endblock %}

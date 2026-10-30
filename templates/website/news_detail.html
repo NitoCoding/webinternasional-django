@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} - News{% endblock %}
+{% block content %}
+<article class="container mx-auto px-6 py-12 max-w-4xl">
+  <a href="{% url 'website:news_list' %}" class="text-redPrimary hover:underline">&larr; Back to News</a>
+  <p class="text-sm text-gray-500 mt-6">{{ item.publication_date|date:"d F Y" }} &middot; {{ item.views }} views</p>
+  <h1 class="text-4xl font-bold text-gray-800 mt-2">{{ item.title }}</h1>
+  {% if item.image %}<img src="{{ item.image.url }}" alt="" class="w-full rounded-2xl shadow-lg my-8">{% endif %}
+  <div class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-line">{{ item.content }}</div>
+</article>
+{% endblock %}

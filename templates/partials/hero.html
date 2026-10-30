@@ -1,0 +1,9 @@
+{% load static %}
+<section class="flex flex-col justify-end bg-cover bg-center text-white relative overflow-hidden"
+  style="background-image: url('{% static 'images/hero.png' %}'); min-height: 60vh;">
+  <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-black/10"></div>
+  <div class="relative container mx-auto px-6 pb-12 z-10">
+    <h1 class="text-5xl font-semibold">{{ title|default:"" }}</h1>
+    {% if description %}<p class="mt-4 text-lg max-w-3xl">{{ description }}</p>{% endif %}
+  </div>
+</section>

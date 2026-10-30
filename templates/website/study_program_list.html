@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Study Program - International Class{% endblock %}
+{% block hero %}{% include "partials/hero.html" with title="Study Program" description="Explore the international study programs at Hasanuddin University." %}{% endblock %}
+{% block content %}
+<section class="container mx-auto px-6 py-16">
+  {% for sp in study_programs %}
+  {% if forloop.first %}<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">{% endif %}
+    <a href="{% url 'website:study_program_detail' sp.pk %}" class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition">
+      {% if sp.image %}<img src="{{ sp.image.url }}" alt="{{ sp.name }}" class="h-44 w-full object-cover">{% endif %}
+      <div class="p-5">
+        <p class="text-xs text-gray-500">{{ sp.faculty.name }}</p>
+        <h2 class="font-bold text-gray-800 mt-1">{{ sp.name }}</h2>
+        <p class="text-sm text-redPrimary mt-2">{{ sp.degree }}</p>
+      </div>
+    </a>
+  {% if forloop.last %}</div>{% endif %}
+  {% empty %}
+  <p class="text-gray-500">No study programs yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}

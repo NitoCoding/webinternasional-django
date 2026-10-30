@@ -1,0 +1,268 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import include, path
+from django.views.decorators.http import require_POST
+
+from apps.academic.models import Student, StudyProgram
+from apps.academic.study_program_csv import search_s1_programs
+from apps.content.models import Event, News, SiteSetting
+from apps.international.models import (
+    OutboundLecturer,
+    Partnership,
+    Program,
+    ProgramEnrollment,
+)
+from apps.website.context_processors import FOOTER_DEFAULTS
+from apps.website.views import SETTING_DEFAULTS, about_image_url
+
+from .crud import _is_admin, crud_urlpatterns
+from .forms import SiteSettingsForm
+
+
+@login_required
+def study_program_autocomplete(request):
+    user = request.user
+    if not (_is_admin(user) or user.has_perm("accounts.manage_program")):
+        return JsonResponse({"detail": "Forbidden"}, status=403)
+    return JsonResponse(search_s1_programs(request.GET.get("query", "")), safe=False)
+
+
+@login_required
+def home(request):
+    user = request.user
+    if user.has_role("student") and not _is_admin(user):
+        student = (
+            Student.objects.filter(user=user).select_related("study_program").first()
+        )
+        enrollments = (
+            ProgramEnrollment.objects.filter(student=student).select_related("program")
+            if student
+            else []
+        )
+        return render(
+            request,
+            "dashboard/student_home.html",
+            {"student": student, "enrollments": enrollments},
+        )
+
+    context = {
+        "news_count": News.objects.count(),
+        "event_count": Event.objects.count(),
+        "program_count": Program.objects.count(),
+        "student_count": Student.objects.count(),
+        "my_news_count": News.objects.filter(user=user).count(),
+    }
+    return render(request, "dashboard/home.html", context)
+
+
+@login_required
+def site_settings(request):
+    if not _is_admin(request.user):
+        raise PermissionDenied
+
+    if request.method == "POST":
+        form = SiteSettingsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Settings berhasil disimpan!")
+            return redirect("dashboard:site_settings_list")
+    else:
+        defaults = {**SETTING_DEFAULTS, **FOOTER_DEFAULTS}
+        form = SiteSettingsForm(initial=SiteSetting.get_all_with_defaults(defaults))
+
+    image_path = SiteSetting.get("about_image", SETTING_DEFAULTS["about_image"])
+    return render(
+        request,
+        "dashboard/site_settings/index.html",
+        {"form": form, "image_url": about_image_url(image_path)},
+    )
+
+
+def _manageable_program(request, pk):
+    user = request.user
+    if not (_is_admin(user) or user.has_perm("accounts.manage_program")):
+        raise PermissionDenied
+    program = get_object_or_404(Program, pk=pk)
+    if not _is_admin(user) and program.created_by_id != user.pk:
+        raise PermissionDenied
+    return program
+
+
+@login_required
+@require_POST
+def program_enrollment_action(request, pk, enrollment_pk):
+    program = _manageable_program(request, pk)
+    enrollment = get_object_or_404(ProgramEnrollment, pk=enrollment_pk, program=program)
+    action = request.POST.get("action")
+    status = request.POST.get("status")
+
+    if status == ProgramEnrollment.Status.APPROVED:
+        enrollment.status = ProgramEnrollment.Status.APPROVED
+        enrollment.save(update_fields=["status"])
+        ProgramEnrollment.objects.filter(student=enrollment.student).exclude(
+            pk=enrollment.pk
+        ).exclude(status=ProgramEnrollment.Status.APPROVED).delete()
+        approved_count = program.enrollments.filter(
+            status=ProgramEnrollment.Status.APPROVED
+        ).count()
+        if approved_count >= program.participants_count:
+            program.enrollments.filter(status=ProgramEnrollment.Status.PENDING).delete()
+        messages.success(request, "Student has been approved.")
+    elif status == ProgramEnrollment.Status.REJECTED:
+        enrollment.delete()
+        messages.success(request, "Student has been rejected.")
+    elif action in ("finish", "unfinish"):
+        enrollment.is_finished = action == "finish"
+        enrollment.save(update_fields=["is_finished"])
+        messages.success(request, "Student status has been updated.")
+    elif action == "delete":
+        enrollment.delete()
+        messages.success(request, "Student has been removed from the program.")
+    else:
+        messages.error(request, "Invalid action.")
+    return redirect("dashboard:programs_detail", pk=program.pk)
+
+
+@login_required
+@require_POST
+def program_add_student(request, pk):
+    program = _manageable_program(request, pk)
+    nim = request.POST.get("nim", "").strip()
+    detail_url = redirect("dashboard:programs_detail", pk=program.pk)
+
+    student = (
+        Student.objects.filter(student_id_number=nim)
+        .select_related("study_program")
+        .first()
+    )
+    if not student:
+        messages.error(request, "Student with this NIM was not found.")
+        return detail_url
+
+    approved_count = program.enrollments.filter(
+        status=ProgramEnrollment.Status.APPROVED
+    ).count()
+    if approved_count >= program.participants_count:
+        messages.error(
+            request, "This program has reached its maximum participant limit."
+        )
+        return detail_url
+    if program.enrollments.filter(student=student).exists():
+        messages.error(request, "This student is already enrolled in this program.")
+        return detail_url
+    if not program.study_programs.filter(pk=student.study_program_id).exists():
+        messages.error(request, "Student's study program does not match this program.")
+        return detail_url
+
+    ProgramEnrollment.objects.create(
+        program=program,
+        student=student,
+        status=ProgramEnrollment.Status.APPROVED,
+        is_finished=True,
+    )
+    messages.success(request, "Student has been added to the program.")
+    return detail_url
+
+
+def _study_program_detail_redirect(pk):
+    return redirect("dashboard:study_programs_detail", pk=pk)
+
+
+@login_required
+@require_POST
+def study_program_add_partnership(request, pk):
+    if not _is_admin(request.user) and not request.user.has_perm(
+        "accounts.manage_program"
+    ):
+        raise PermissionDenied
+    study_program = get_object_or_404(StudyProgram, pk=pk)
+    number = request.POST.get("mou_moa_ia_number", "").strip()
+    title = request.POST.get("title_of_cooperation", "").strip()
+    validity = request.POST.get("validity_period", "").strip()
+    if not (number and title and validity):
+        messages.error(request, "All fields are required.")
+    elif not validity.isdigit() or int(validity) > 32767:
+        messages.error(request, "Validity Period must be a whole number.")
+    else:
+        Partnership.objects.create(
+            study_program=study_program,
+            mou_moa_ia_number=number,
+            title_of_cooperation=title,
+            validity_period=int(validity),
+        )
+        messages.success(request, "Partnership added successfully")
+    return _study_program_detail_redirect(study_program.pk)
+
+
+@login_required
+@require_POST
+def study_program_add_outbound_lecturer(request, pk):
+    if not _is_admin(request.user) and not request.user.has_perm(
+        "accounts.manage_program"
+    ):
+        raise PermissionDenied
+    study_program = get_object_or_404(StudyProgram, pk=pk)
+    data = {
+        key: request.POST.get(key, "").strip()
+        for key in (
+            "lecturer_name",
+            "gender",
+            "role_in_ki",
+            "university_name",
+            "activity_year",
+        )
+    }
+    if not all(data.values()):
+        messages.error(request, "All fields are required.")
+    elif data["gender"] not in ("Male", "Female"):
+        messages.error(request, "Gender must be Male or Female.")
+    elif not data["activity_year"].isdigit() or int(data["activity_year"]) > 32767:
+        messages.error(request, "Activity Year must be a whole number.")
+    else:
+        OutboundLecturer.objects.create(
+            study_program=study_program,
+            lecturer_name=data["lecturer_name"],
+            gender=data["gender"],
+            role_in_ki=data["role_in_ki"],
+            university_name=data["university_name"],
+            activity_year=int(data["activity_year"]),
+        )
+        messages.success(request, "Outbound Lecturer added successfully")
+    return _study_program_detail_redirect(study_program.pk)
+
+
+app_name = "dashboard"
+
+urlpatterns = [
+    path("", home, name="home"),
+    path(
+        "study-programs/autocomplete/",
+        study_program_autocomplete,
+        name="study_program_autocomplete",
+    ),
+    path("site-settings/", site_settings, name="site_settings_list"),
+    path(
+        "programs/<int:pk>/enrollments/<int:enrollment_pk>/action/",
+        program_enrollment_action,
+        name="program_enrollment_action",
+    ),
+    path(
+        "programs/<int:pk>/add-student/",
+        program_add_student,
+        name="program_add_student",
+    ),
+    path(
+        "study-programs/<int:pk>/partnerships/",
+        study_program_add_partnership,
+        name="study_program_add_partnership",
+    ),
+    path(
+        "study-programs/<int:pk>/outbound-lecturers/",
+        study_program_add_outbound_lecturer,
+        name="study_program_add_outbound_lecturer",
+    ),
+    *crud_urlpatterns(),
+]

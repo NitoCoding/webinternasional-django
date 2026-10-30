@@ -1,0 +1,63 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ action }} Faculty - Dashboard{% endblock %}
+{% block heading %}{{ action }} Faculty{% endblock %}
+{% block content %}
+<style>
+  /* Widget dari StyledModelForm memakai kelas DaisyUI; CSS ini hanya berlaku di form ini. */
+  .compact-form .input, .compact-form .select { height: auto; min-height: 2.5rem; padding: .5rem .75rem; font-size: .875rem; }
+</style>
+
+<div class="max-w-3xl mx-auto compact-form space-y-4">
+
+  <!-- Header -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">{{ action }} Faculty</h2>
+        <p class="text-gray-500 text-sm mt-1">Faculty name and code.</p>
+      </div>
+      <a href="{{ list_url }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-colors">Back</a>
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}
+  <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+    <ul class="list-disc list-inside space-y-1 text-sm text-red-700">
+      {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+
+    <!-- 1. Faculty Information -->
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-5">
+      <h3 class="text-base font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">1</span>
+        Faculty Information
+      </h3>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Faculty Name <span class="text-red-500">*</span></label>
+          {{ form.name }}
+          {% for err in form.name.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+        <div>
+          <label for="{{ form.code.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Code <span class="text-red-500">*</span></label>
+          {{ form.code }}
+          {% for err in form.code.errors %}<p class="text-red-500 text-sm mt-1">{{ err }}</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <a href="{{ list_url }}" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-lg transition-colors">Cancel</a>
+      <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+        {% if action == "New" %}Add Faculty{% else %}Save Changes{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

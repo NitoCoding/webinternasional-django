@@ -1,0 +1,61 @@
+{% extends "dashboard/crud/list_shell.html" %}
+{% block page_title %}News{% endblock %}
+{% block page_subtitle %}Manage news articles{% endblock %}
+{% block add_label %}Add News{% endblock %}
+{% block search_placeholder %}Search news by title...{% endblock %}
+{% block list_filters %}
+  <select name="study_program" onchange="this.form.submit()"
+    class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+    <option value="">All Study Programs</option>
+    {% for sp in study_programs %}
+      <option value="{{ sp.pk }}" {% if selected.study_program == sp.pk|stringformat:"s" %}selected{% endif %}>{{ sp.name }}</option>
+    {% endfor %}
+  </select>
+  <select name="status" onchange="this.form.submit()"
+    class="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+    <option value="">All Statuses</option>
+    {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if selected.status == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+{% endblock %}
+
+{% block list_rows %}
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Title</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Study Program</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Publication Date</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Views</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for row in rows %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              {% if row.obj.image %}
+                <img src="{{ row.obj.image.url }}" alt="{{ row.obj.title }}" class="w-10 h-10 rounded-lg object-cover bg-gray-100 flex-shrink-0">
+              {% endif %}
+              <a href="{{ row.detail_url }}" class="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">{{ row.obj.title }}</a>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ row.obj.study_program.name|default:"-" }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{{ row.obj.publication_date|date:"d M Y" }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">{{ row.obj.views }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-2">
+              {% include "dashboard/partials/row_actions.html" with row=row entity="News" %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+{% block empty_title %}No News Found{% endblock %}
+{% block empty_hint %}Start by creating a news article.{% endblock %}

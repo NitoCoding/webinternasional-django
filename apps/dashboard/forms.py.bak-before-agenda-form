@@ -1,0 +1,281 @@
+from pathlib import Path
+
+from django import forms
+from django.contrib.auth.hashers import make_password
+from django.core.files.storage import default_storage
+from django.urls import reverse
+
+from apps.academic.models import Faculty, IeProgram, Student, StudyProgram
+from apps.academic.study_program_csv import valid_study_program_names
+from apps.accounts.models import User
+from apps.content.models import Agenda, Event, News, SiteSetting
+from apps.international.models import OutboundLecturer, Partnership, Program
+from apps.website.context_processors import FOOTER_DEFAULTS
+
+DATETIME_INPUT_FORMATS = ["%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S"]
+
+
+class StyledModelForm(forms.ModelForm):
+    """Memberi class DaisyUI ke setiap widget dan memakai input datetime-local."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            widget = field.widget
+            if isinstance(widget, forms.CheckboxInput):
+                css = "checkbox"
+            elif isinstance(widget, (forms.Select, forms.SelectMultiple)):
+                css = "select select-bordered w-full"
+            elif isinstance(widget, forms.Textarea):
+                css = "textarea textarea-bordered w-full"
+            elif isinstance(widget, forms.FileInput):
+                css = "file-input file-input-bordered w-full"
+            else:
+                css = "input input-bordered w-full"
+            widget.attrs["class"] = css
+
+            if isinstance(field, forms.DateTimeField):
+                field.widget = forms.DateTimeInput(
+                    attrs={"type": "datetime-local", "class": css}, format="%Y-%m-%dT%H:%M"
+                )
+                field.input_formats = DATETIME_INPUT_FORMATS
+            elif isinstance(field, forms.DateField):
+                field.widget = forms.DateInput(attrs={"type": "date", "class": css}, format="%Y-%m-%d")
+
+
+class NewsForm(StyledModelForm):
+    class Meta:
+        model = News
+        fields = ["title", "content", "publication_date", "image", "study_program"]
+
+
+class EventForm(StyledModelForm):
+    class Meta:
+        model = Event
+        fields = ["title", "content", "event_date", "publication_date", "image", "study_program"]
+
+
+class AgendaForm(StyledModelForm):
+    class Meta:
+        model = Agenda
+        fields = ["title", "description", "start", "end"]
+
+
+class FacultyForm(StyledModelForm):
+    class Meta:
+        model = Faculty
+        fields = ["name", "code"]
+
+
+class IeProgramForm(StyledModelForm):
+    class Meta:
+        model = IeProgram
+        fields = ["name"]
+
+
+class StudyProgramForm(StyledModelForm):
+    class Meta:
+        model = StudyProgram
+        fields = [
+            "faculty", "name", "degree", "description", "image", "classrooms", "lecturers",
+            "national_accreditation", "international_accreditation", "approval_sk", "opening_year",
+            "director_name", "director_contact", "ukt_fee", "ipi_fee", "international_exposure",
+            "total_courses", "rps_courses_in_english", "teaching_materials_in_english",
+            "courses_delivered_in_english", "courses_fully_filled_in_sikola",
+        ]
+
+    # field setelah image ditampilkan dalam dua kolom
+    two_column_fields = [
+        "classrooms", "lecturers", "national_accreditation", "international_accreditation", "approval_sk",
+        "opening_year", "director_name", "director_contact", "ukt_fee", "ipi_fee", "international_exposure",
+        "total_courses", "rps_courses_in_english", "teaching_materials_in_english",
+        "courses_delivered_in_english", "courses_fully_filled_in_sikola",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs["data-autocomplete-url"] = reverse("dashboard:study_program_autocomplete")
+        if self.instance.pk is None:
+            self.fields["image"].required = True
+
+    def clean_name(self):
+        name = self.cleaned_data["name"]
+        if self.instance.pk is None and StudyProgram.objects.filter(name=name).exists():
+            raise forms.ValidationError("Study program already exists.")
+        if name not in valid_study_program_names():
+            raise forms.ValidationError("Study program name is invalid.")
+        return name
+
+
+class ProgramForm(StyledModelForm):
+    class Meta:
+        model = Program
+        fields = [
+            "name", "description", "country", "execution_date", "end_date", "participants_count",
+            "course_credits", "image", "brochure_pdf", "ie_program", "study_programs",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["study_programs"].required = True
+        if self.instance.pk is None:
+            self.fields["image"].required = True
+
+    def clean(self):
+        cleaned = super().clean()
+        start, end = cleaned.get("execution_date"), cleaned.get("end_date")
+        if start and end and end < start:
+            self.add_error("end_date", "End date must be the same as or after the start date.")
+        return cleaned
+
+
+# Negara pada form Degree Program, sama dengan pilihan di DegreeProgramController Laravel.
+DEGREE_COUNTRIES = [
+    ("jp", "Japan"), ("nz", "New Zealand"), ("au", "Australia"), ("cn", "China"), ("kr", "South Korea"),
+    ("my", "Malaysia"), ("sg", "Singapore"), ("th", "Thailand"), ("us", "United States"),
+    ("uk", "United Kingdom"), ("de", "Germany"), ("fr", "France"), ("nl", "Netherlands"),
+]
+DEGREE_TYPES = [("double_degree", "Double Degree"), ("joint_degree", "Joint Degree")]
+
+
+class PartnershipForm(StyledModelForm):
+    partnership_type = forms.ChoiceField(choices=[("", "Select Type"), *DEGREE_TYPES], label="Type")
+    country_flag = forms.ChoiceField(choices=[("", "Select Country"), *DEGREE_COUNTRIES], label="Partner Country")
+
+    class Meta:
+        model = Partnership
+        fields = [
+            "partnership_type", "partner_university", "country", "country_flag", "unhas_program",
+            "partner_program", "specialization", "duration", "program_structure", "entry_requirements",
+            "highlights", "image", "brochure_pdf", "is_active", "title_of_cooperation",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["country"].required = False
+        self.fields["country"].widget = forms.HiddenInput()
+        self.fields["unhas_program"].widget.attrs["data-autocomplete-url"] = reverse(
+            "dashboard:study_program_autocomplete")
+
+    def clean(self):
+        cleaned = super().clean()
+        code = cleaned.get("country_flag")
+        if code:
+            cleaned["country"] = dict(DEGREE_COUNTRIES)[code]
+        return cleaned
+
+
+class OutboundLecturerForm(StyledModelForm):
+    class Meta:
+        model = OutboundLecturer
+        fields = ["lecturer_name", "gender", "role_in_ki", "university_name", "activity_year", "study_program"]
+
+
+class UserForm(StyledModelForm):
+    password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={"class": "input input-bordered w-full"}),
+        help_text="Leave blank if you do not want to change the password.",
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "name", "email", "groups", "is_active"]
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get("password")
+        if password:
+            user.password = make_password(password)
+        if commit:
+            user.save()
+            self.save_m2m()
+        return user
+
+
+class StudentForm(StyledModelForm):
+    class Meta:
+        model = Student
+        fields = [
+            "user", "name", "student_id_number", "email", "is_active", "is_verified", "gender",
+            "english_score", "status", "nik", "nisn", "phone_number", "home_phone", "address",
+            "postal_code", "birth_place", "birth_date", "study_program",
+        ]
+
+
+INPUT_CLASS = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+INPUT_SM_CLASS = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+IMAGE_MAX_BYTES = 2 * 1024 * 1024
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+
+class SiteSettingsForm(forms.Form):
+    """Form halaman Site Settings, setara dengan SiteSettingController::update di Laravel."""
+
+    about_title = forms.CharField(max_length=255, label="Section Title",
+                                  widget=forms.TextInput(attrs={"class": INPUT_CLASS}))
+    about_paragraph_1 = forms.CharField(label="First Paragraph",
+                                        widget=forms.Textarea(attrs={"rows": 4, "class": INPUT_CLASS}))
+    about_paragraph_2 = forms.CharField(label="Second Paragraph",
+                                        widget=forms.Textarea(attrs={"rows": 4, "class": INPUT_CLASS}))
+    about_image = forms.ImageField(
+        required=False, label="About Image",
+        error_messages={"invalid_image": "File must be an image."},
+        widget=forms.FileInput(attrs={
+            "accept": "image/*", "onchange": "previewImage(this)",
+            "class": "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 "
+                     "focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 "
+                     "file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100",
+        }),
+    )
+    footer_address = forms.CharField(max_length=500, required=False, label="Address",
+                                     widget=forms.Textarea(attrs={"rows": 2, "class": INPUT_CLASS}))
+    footer_phone = forms.CharField(max_length=50, required=False, label="Phone",
+                                   widget=forms.TextInput(attrs={"class": INPUT_CLASS}))
+    footer_email = forms.EmailField(max_length=100, required=False, label="Email",
+                                    error_messages={"invalid": "Invalid email format."},
+                                    widget=forms.EmailInput(attrs={"class": INPUT_CLASS}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for i in range(1, 5):
+            self.fields[f"ie_card_{i}_title"] = forms.CharField(
+                max_length=100, label="Title", widget=forms.TextInput(attrs={"class": INPUT_SM_CLASS}))
+            self.fields[f"ie_card_{i}_desc"] = forms.CharField(
+                max_length=255, label="Description", widget=forms.Textarea(attrs={"rows": 2, "class": INPUT_SM_CLASS}))
+
+    @property
+    def ie_cards(self):
+        return [(i, self[f"ie_card_{i}_title"], self[f"ie_card_{i}_desc"]) for i in range(1, 5)]
+
+    def clean_about_image(self):
+        image = self.cleaned_data.get("about_image")
+        if image:
+            if image.size > IMAGE_MAX_BYTES:
+                raise forms.ValidationError("Image is too large! Maximum 2MB.")
+            if Path(image.name).suffix.lower() not in IMAGE_EXTENSIONS:
+                raise forms.ValidationError("Image must be JPEG, PNG, GIF, or WebP.")
+        return image
+
+    def save(self):
+        data = self.cleaned_data
+        values = {
+            "about_title": ("text", data["about_title"]),
+            "about_paragraph_1": ("html", data["about_paragraph_1"]),
+            "about_paragraph_2": ("html", data["about_paragraph_2"]),
+        }
+        for i in range(1, 5):
+            values[f"ie_card_{i}_title"] = ("text", data[f"ie_card_{i}_title"])
+            values[f"ie_card_{i}_desc"] = ("text", data[f"ie_card_{i}_desc"])
+        for key, default in FOOTER_DEFAULTS.items():
+            values[key] = ("text", data[key] or default)
+        for key, (setting_type, value) in values.items():
+            SiteSetting.objects.update_or_create(key=key, defaults={"value": value, "type": setting_type})
+
+        image = data.get("about_image")
+        if image:
+            old = SiteSetting.get("about_image")
+            if old and old.startswith("settings/") and default_storage.exists(old):
+                default_storage.delete(old)
+            path = default_storage.save(f"settings/{image.name}", image)
+            SiteSetting.objects.update_or_create(key="about_image", defaults={"value": path, "type": "image"})
