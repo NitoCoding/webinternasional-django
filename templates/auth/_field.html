@@ -1,0 +1,9 @@
+{% comment %}Satu field form auth: label, input, help text, dan error.{% endcomment %}
+<div class="space-y-1">
+  <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+    {{ field.label }}{% if field.field.required %} <span class="text-red-600">*</span>{% endif %}
+  </label>
+  {{ field }}
+  {% if field.help_text %}<p class="text-xs text-gray-500">{{ field.help_text|safe }}</p>{% endif %}
+  {% for error in field.errors %}<p class="text-xs text-red-600">{{ error }}</p>{% endfor %}
+</div>

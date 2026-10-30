@@ -174,11 +174,11 @@ def student_summary(nim, today=None):
         return {"ok": False, **base}
     rows = result["rows"]
     if not rows:
-        return {"ok": False, "message": "Data transkrip tidak ditemukan", "from_cache": result["from_cache"]}
+        return {"ok": False, "message": "Transcript data not found", "from_cache": result["from_cache"]}
 
     angkatan = _to_int(result.get("angkatan")) or _to_int(angkatan_from_nim(nim))
     if not angkatan:
-        return {"ok": False, "message": "Angkatan mahasiswa tidak diketahui", "from_cache": result["from_cache"]}
+        return {"ok": False, "message": "Student cohort is unknown", "from_cache": result["from_cache"]}
 
     semester = student_semester_summary(angkatan, today)
     sks_lulus = sum(_to_int(r["sks"]) for r in rows if r["huruf"] in PASSING_GRADES)

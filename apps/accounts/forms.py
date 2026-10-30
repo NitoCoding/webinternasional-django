@@ -1,5 +1,10 @@
 from django import forms
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+    PasswordResetForm,
+    SetPasswordForm,
+)
 from django.contrib.auth.password_validation import validate_password
 
 from apps.academic.models import Student
@@ -16,7 +21,31 @@ class StyledMixin:
             field.widget.attrs.setdefault("class", INPUT_CLASS)
 
 
-class RegisterForm(StyledMixin, forms.ModelForm):
+AUTH_INPUT_CLASS = "w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+
+class AuthStyledMixin:
+    """Gaya input halaman auth: border abu dan fokus biru, sama dengan dashboard."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", AUTH_INPUT_CLASS)
+
+
+class LoginForm(AuthStyledMixin, AuthenticationForm):
+    pass
+
+
+class StyledPasswordResetForm(AuthStyledMixin, PasswordResetForm):
+    pass
+
+
+class StyledSetPasswordForm(AuthStyledMixin, SetPasswordForm):
+    pass
+
+
+class RegisterForm(AuthStyledMixin, forms.ModelForm):
     password1 = forms.CharField(label="Password", strip=False, widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirm password", strip=False, widget=forms.PasswordInput)
 

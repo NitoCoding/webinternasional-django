@@ -17,7 +17,7 @@ class SipakamaseClient:
     def __init__(self, transport=None):
         self.base_url = (settings.SIPAKAMASE_URL or "").rstrip("/")
         if not self.base_url:
-            raise SipakamaseError("SIPAKAMASE_URL belum diatur di .env.")
+            raise SipakamaseError("SIPAKAMASE_URL is not set in .env.")
         self._http = httpx.Client(
             timeout=settings.SIPAKAMASE_TIMEOUT,
             transport=transport,
@@ -36,12 +36,12 @@ class SipakamaseClient:
                 json={"username": settings.SIPAKAMASE_USERNAME, "password": settings.SIPAKAMASE_PASSWORD},
             )
         except httpx.HTTPError as exc:
-            raise SipakamaseError(f"Tidak dapat terhubung ke server SIPAKAMASE: {exc}") from exc
+            raise SipakamaseError(f"Cannot connect to the SIPAKAMASE server: {exc}") from exc
         if resp.status_code != 200:
-            raise SipakamaseError(f"Login SIPAKAMASE gagal (HTTP {resp.status_code}).")
+            raise SipakamaseError(f"SIPAKAMASE login failed (HTTP {resp.status_code}).")
         token = resp.json().get("access_token")
         if not token:
-            raise SipakamaseError("Login SIPAKAMASE tidak mengembalikan access token.")
+            raise SipakamaseError("SIPAKAMASE login did not return an access token.")
         self._token = token
 
     def get_student(self, nim):
@@ -71,11 +71,11 @@ class SipakamaseClient:
                     json=body,
                 )
             except httpx.HTTPError as exc:
-                raise SipakamaseError(f"Tidak dapat terhubung ke server SIPAKAMASE: {exc}") from exc
+                raise SipakamaseError(f"Cannot connect to the SIPAKAMASE server: {exc}") from exc
             if resp.status_code == 401 and attempt == 1:
                 self.login()
                 continue
             if resp.status_code != 200:
-                raise SipakamaseError(f"Permintaan ke {path} gagal (HTTP {resp.status_code}).")
+                raise SipakamaseError(f"Request to {path} failed (HTTP {resp.status_code}).")
             return resp.json()
-        raise SipakamaseError(f"Permintaan ke {path} gagal.")
+        raise SipakamaseError(f"Request to {path} failed.")

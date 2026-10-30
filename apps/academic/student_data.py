@@ -12,7 +12,7 @@ from apps.academic.sipakamase import SipakamaseClient, SipakamaseError
 
 TRANSCRIPT_CACHE_SECONDS = 600  # 10 menit, sama dengan Laravel
 KRS_CACHE_SECONDS = 1800  # 30 menit, sama dengan Laravel
-CACHE_NOTE = "Data dari cache (server sedang sibuk)"
+CACHE_NOTE = "Data from cache (server busy)"
 
 
 def _process_transcript(raw):
@@ -29,8 +29,8 @@ def _process_transcript(raw):
     mahasiswa = raw.get("mahasiswa") or {}
     return {
         "rows": rows,
-        "nama": mahasiswa.get("nama_mahasiswa") or "Tidak Tersedia",
-        "nim": mahasiswa.get("nim") or "Tidak Tersedia",
+        "nama": mahasiswa.get("nama_mahasiswa") or "Not available",
+        "nim": mahasiswa.get("nim") or "Not available",
         "email": mahasiswa.get("email") or "",
         "prodi": (mahasiswa.get("prodi") or {}).get("nama_resmi") or "",
         "angkatan": mahasiswa.get("angkatan"),
@@ -46,19 +46,19 @@ def transcript_data(nim):
         client = SipakamaseClient()
         raw = client.get_transcript(nim)
         if not raw.get("transkrips") and not raw.get("mahasiswa"):
-            raise SipakamaseError("Data transkrip tidak ditemukan.")
+            raise SipakamaseError("Transcript data not found.")
         processed = _process_transcript(raw)
         cache.set(cache_key, processed, TRANSCRIPT_CACHE_SECONDS)
-        return {"ok": True, "message": "Data berhasil diambil", "from_cache": False, **processed}
+        return {"ok": True, "message": "Data retrieved successfully", "from_cache": False, **processed}
     except SipakamaseError as exc:
         cached = cache.get(cache_key)
         if cached:
             return {"ok": True, "message": CACHE_NOTE, "from_cache": True, **cached}
         return {
             "ok": False,
-            "message": f"Gagal mengambil data: {exc}",
+            "message": f"Failed to retrieve data: {exc}",
             "from_cache": False,
-            "rows": [], "nama": "Tidak Tersedia", "nim": nim,
+            "rows": [], "nama": "Not available", "nim": nim,
         }
     finally:
         if client is not None:
@@ -91,19 +91,19 @@ def krs_data(nim, semester):
         client = SipakamaseClient()
         raw = client.get_krs(nim, semester)
         if "krs" not in raw:
-            raise SipakamaseError("Data KRS tidak ditemukan.")
+            raise SipakamaseError("Study plan data not found.")
         rows = [
             {"nama": item["nama_mata_kuliah"], "sks": item["jumlah_sks"]}
             for item in raw["krs"]
             if "nama_mata_kuliah" in item and "jumlah_sks" in item
         ]
         cache.set(cache_key, rows, KRS_CACHE_SECONDS)
-        return _krs_result(True, "Data berhasil diambil", False, rows)
+        return _krs_result(True, "Data retrieved successfully", False, rows)
     except SipakamaseError as exc:
         cached = cache.get(cache_key)
         if cached is not None:
             return _krs_result(True, CACHE_NOTE, True, cached)
-        return _krs_result(False, f"Data KRS tidak ditemukan atau gagal diambil: {exc}", False, [])
+        return _krs_result(False, f"Study plan data not found or could not be retrieved: {exc}", False, [])
     finally:
         if client is not None:
             client.close()

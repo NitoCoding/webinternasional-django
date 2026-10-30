@@ -7,23 +7,27 @@
   <link rel="icon" type="image/png" href="{% static 'images/logoUnhas.png' %}">
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style type="text/tailwindcss">
-    @theme {
-      --color-redPrimary: #991b1b;
-      --color-bluePrimary: #1e40af;
-    }
-  </style>
 </head>
-<body class="min-h-full bg-gray-100 text-gray-800">
+<body class="min-h-full bg-blue-50 antialiased text-gray-800">
   <div class="min-h-screen flex flex-col items-center justify-center px-4 py-10">
+    <div class="w-full {% block card_width %}max-w-sm{% endblock %}">
+      <div class="flex flex-col items-center mb-5">
+        <img src="{% static 'images/logoUnhas.png' %}" alt="Logo Universitas Hasanuddin" class="h-14 w-14 object-contain mb-2">
+        <p class="text-lg font-bold text-blue-700">International Class</p>
+        <p class="text-xs text-gray-500">Hasanuddin University</p>
+      </div>
 
-    <div class="w-full max-w-md">
       {% if messages %}
       <div class="space-y-2 mb-4">
-        {% for m in messages %}<div class="bg-green-100 text-green-800 rounded-lg px-4 py-2 text-sm">{{ m }}</div>{% endfor %}
+        {% for m in messages %}
+        <div class="rounded-lg px-4 py-2 text-sm {% if m.level_tag == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">{{ m }}</div>
+        {% endfor %}
       </div>
       {% endif %}
-      {% block content %}{% endblock %}
+
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        {% block content %}{% endblock %}
+      </div>
     </div>
   </div>
 </body>
