@@ -60,6 +60,13 @@ Target: `D:\Proyek\Unhas\international-django` (Django + GeoDjango tidak dipakai
 - Batas sertifikat 5 MB dan gambar logbook 2 MB (sama dengan Laravel).
 - Deskripsi logbook maks 50 karakter (sama dengan Laravel). Perlu dikonfirmasi ulang oleh pengguna.
 - Logout redirect ke `website:home`. Halaman 403 berdiri sendiri, tanpa sidebar.
+- View dashboard dipisah per fitur (`apps/dashboard/views/`): setiap fitur (news,
+  events, agendas, study-programs, faculties, ie-programs, programs, partnerships,
+  outbound-lecturers, users, students + home/site_settings/student_*) memakai CBV
+  Django (ListView, DetailView, CreateView, UpdateView, DeleteView) dari base class
+  bersama di `views/base.py`. Nama URL dan perilaku tetap sama; `crud.py`,
+  `user_views.py`, `student_views.py`, `student_programs.py`, `student_calendar.py`,
+  `logbook_views.py` dihapus.
 
 ## Penyimpangan dari Laravel (dicatat)
 

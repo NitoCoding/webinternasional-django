@@ -52,7 +52,7 @@ class AddStudentTests(UserListFixtureMixin, TestCase):
         self.api = FakeApi({"D123211001": dict(API_STUDENT, prodi={"nama_resmi": "Informatika"})})
 
     def _post_nim(self, nim, follow=False):
-        with mock.patch("apps.dashboard.user_views.SipakamaseClient", return_value=self.api):
+        with mock.patch("apps.dashboard.views.users.SipakamaseClient", return_value=self.api):
             return self.client.post(reverse("dashboard:user_add_student"), {"nim": nim}, follow=follow)
 
     def test_adds_student_with_api_data_and_initial_password(self):
@@ -97,7 +97,7 @@ class AddStudentTests(UserListFixtureMixin, TestCase):
             def get_student(self, nim):
                 raise SipakamaseError("Tidak dapat terhubung ke server SIPAKAMASE.")
 
-        with mock.patch("apps.dashboard.user_views.SipakamaseClient", return_value=Broken()):
+        with mock.patch("apps.dashboard.views.users.SipakamaseClient", return_value=Broken()):
             resp = self.client.post(reverse("dashboard:user_add_student"), {"nim": "D1"}, follow=True)
         self.assertContains(resp, "Tidak dapat terhubung ke server SIPAKAMASE.")
 

@@ -39,6 +39,10 @@ INSTALLED_APPS = [
     "apps.dashboard",
 ]
 
+# Tool pengembangan (runserver_plus, shell_plus, show_urls) hanya aktif saat DEBUG=True.
+if DEBUG:
+    INSTALLED_APPS += ["django_extensions"]
+
 # User model kustom harus diset sebelum migration pertama
 AUTH_USER_MODEL = "accounts.User"
 

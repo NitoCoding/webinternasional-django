@@ -20,7 +20,7 @@ from django.shortcuts import get_object_or_404
 from apps.academic.models import Staff, Student, StudyProgram
 from apps.academic.sipakamase import SipakamaseClient, SipakamaseError
 from apps.accounts.models import User
-from apps.dashboard.crud import _is_admin
+from apps.dashboard.views.base import _is_admin
 
 DEFAULT_EMAIL_DOMAIN = "unhas.ac.id"
 CSV_MAX_BYTES = 2 * 1024 * 1024

@@ -1,15 +1,18 @@
+"""Fitur akademik student: transkrip, study plan, dan ringkasan dashboard."""
+
 from datetime import date
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
+from django.views.generic import TemplateView
 
 from apps.academic.student_data import krs_data, semester_options, transcript_data
 
-from .dashboard_stats import student_summary
+from ..dashboard_stats import student_summary
 
 
 def _require_student(user):
@@ -29,15 +32,39 @@ def _semester_label(code):
     return f"{year} {'Ganjil' if term == '1' else 'Genap'}"
 
 
-@login_required
-@require_GET
-def student_transcript(request):
+class StudentPageMixin:
+    """Halaman akademik student hanya untuk role student (selain role lain: 403)."""
+
+    def dispatch(self, request, *args, **kwargs):
+        _require_student(request.user)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class StudentTranscriptView(LoginRequiredMixin, StudentPageMixin, TemplateView):
     """Halaman kosong; data transkrip dimuat lewat AJAX dari student_transcript_data."""
-    _require_student(request.user)
-    return render(request, "dashboard/student/transcript.html", {
-        "nim": request.user.username,
-        "data_url": reverse("dashboard:student_transcript_data"),
-    })
+
+    template_name = "dashboard/student/transcript.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["nim"] = self.request.user.username
+        ctx["data_url"] = reverse("dashboard:student_transcript_data")
+        return ctx
+
+
+class StudentStudyPlanView(LoginRequiredMixin, StudentPageMixin, TemplateView):
+    """Halaman dengan dropdown semester; tabel KRS dimuat lewat AJAX."""
+
+    template_name = "dashboard/student/study_plan.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        nim = self.request.user.username
+        options = semester_options(nim, date.today())
+        ctx["nim"] = nim
+        ctx["semesters"] = [{"code": c, "label": _semester_label(c)} for c in options]
+        ctx["data_url"] = reverse("dashboard:student_study_plan_data")
+        return ctx
 
 
 @login_required
@@ -65,20 +92,6 @@ def student_dashboard_data(request):
     if denied:
         return denied
     return JsonResponse(student_summary(request.user.username, date.today()))
-
-
-@login_required
-@require_GET
-def student_study_plan(request):
-    """Halaman dengan dropdown semester; tabel KRS dimuat lewat AJAX."""
-    _require_student(request.user)
-    nim = request.user.username
-    options = semester_options(nim, date.today())
-    return render(request, "dashboard/student/study_plan.html", {
-        "nim": nim,
-        "semesters": [{"code": c, "label": _semester_label(c)} for c in options],
-        "data_url": reverse("dashboard:student_study_plan_data"),
-    })
 
 
 @login_required
