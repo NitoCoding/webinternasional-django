@@ -11,7 +11,10 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(BASE_DIR / ".env")
+# File env bisa dipilih lewat DJANGO_ENV_FILE (mis. /srv/international-django/prod.env).
+# Tanpa variabel itu, dipakai .env di root proyek.
+ENV_FILE = env("DJANGO_ENV_FILE", default=str(BASE_DIR / ".env"))
+environ.Env.read_env(ENV_FILE)
 
 
 # ---------------------------------------------------------------------------
@@ -30,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    'django_extensions',
     "apps.core",
     "apps.accounts",
     "apps.academic",
@@ -38,10 +42,6 @@ INSTALLED_APPS = [
     "apps.website",
     "apps.dashboard",
 ]
-
-# Tool pengembangan (runserver_plus, shell_plus, show_urls) hanya aktif saat DEBUG=True.
-if DEBUG:
-    INSTALLED_APPS += ["django_extensions"]
 
 # User model kustom harus diset sebelum migration pertama
 AUTH_USER_MODEL = "accounts.User"
@@ -179,6 +179,20 @@ CSV_IMPORT_DELAY_SECONDS = env.float("CSV_IMPORT_DELAY_SECONDS", default=0.5)
 ACADEMIC_MAX_STUDY_PERIOD_DEFAULT = 14  # angkatan <= ACADEMIC_POLICY_CHANGE_YEAR
 ACADEMIC_MAX_STUDY_PERIOD_FROM_2023 = 10
 ACADEMIC_POLICY_CHANGE_YEAR = 2022
+
+
+# ---------------------------------------------------------------------------
+# Security (deployment). Nilai diambil dari .env; untuk development biarkan
+# default False/0 agar HTTPS tidak dipaksakan.
+# ---------------------------------------------------------------------------
+
+# Header yang menunjukkan protokol asli saat django di belakang reverse proxy
+# (nginx). Format tuple di .env: ("HTTP_X_FORWARDED_PROTO", "https").
+SECURE_PROXY_SSL_HEADER = env.tuple("SECURE_PROXY_SSL_HEADER", default=None)
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=False)
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=False)
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=0)
 
 
 # ---------------------------------------------------------------------------

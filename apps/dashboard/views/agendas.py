@@ -146,7 +146,7 @@ class AgendaListView(AgendaAccessMixin, ListView):
         query.pop("page", None)
         ctx["filter_qs"] = query.urlencode()
         ctx["has_filters"] = any(v for v in query.values())
-        ctx["rows"] = [_agenda_row(obj) for obj in self.object_list]
+        ctx["rows"] = [_agenda_row(obj) for obj in ctx["object_list"]]
         ctx["headers"] = [
             Agenda._meta.get_field(c).verbose_name.capitalize()
             for c in AGENDA_COLUMNS

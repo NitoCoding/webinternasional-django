@@ -1,4 +1,4 @@
-{% comment %}Modal form untuk Add Student, Upload CSV, dan English Score. Dibuka dengan checkbox toggle, sama seperti modal lain.{% endcomment %}
+{% comment %}Modal form untuk Add Student, Upload CSV, dan Add Staff. Dibuka dengan checkbox toggle, sama seperti modal lain.{% endcomment %}
 
 <input type="checkbox" id="add-student-modal" class="modal-toggle hidden" />
 <div class="modal">
@@ -46,24 +46,7 @@
   <label class="modal-backdrop" for="upload-csv-modal"></label>
 </div>
 
-<input type="checkbox" id="english-score-modal" class="modal-toggle hidden" />
-<div class="modal">
-  <div class="modal-box max-w-sm p-5">
-    <h3 class="text-lg font-bold text-gray-900 mb-1">English Score</h3>
-    <p class="text-sm text-gray-600 mb-4">Enter a whole number from 0 to 100.</p>
-    <form id="english-score-form" method="post" action="" class="space-y-4">
-      {% csrf_token %}
-      <input type="hidden" name="tab" id="english-score-tab" value="all">
-      <input type="number" name="english_score" id="english-score-input" min="0" max="100" step="1" required
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg text-center font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-      <div class="flex gap-3">
-        <label for="english-score-modal" class="flex-1 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-center cursor-pointer">Cancel</label>
-        <button type="submit" class="flex-1 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg">Save</button>
-      </div>
-    </form>
-  </div>
-  <label class="modal-backdrop" for="english-score-modal"></label>
-</div>
+
 
 <input type="checkbox" id="add-staff-modal" class="modal-toggle hidden" />
 <div class="modal">
@@ -114,17 +97,4 @@
   <label class="modal-backdrop" for="add-staff-modal"></label>
 </div>
 
-<script>
-(function () {
-  // Tombol Edit English Score ada di dalam modal detail (dimuat lewat fetch),
-  // jadi memakai delegasi event pada document.
-  document.addEventListener("click", function (e) {
-    var btn = e.target.closest && e.target.closest(".js-english-score");
-    if (!btn) return;
-    document.getElementById("english-score-form").action = btn.dataset.url;
-    document.getElementById("english-score-input").value = btn.dataset.score;
-    document.getElementById("english-score-tab").value = btn.dataset.tab;
-    document.getElementById("english-score-modal").checked = true;
-  });
-})();
-</script>
+

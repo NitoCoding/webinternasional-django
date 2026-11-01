@@ -47,6 +47,9 @@ class StudentListView(StudentAccessMixin, ListView):
     paginate_by = 20
     template_name = "dashboard/crud/list.html"
 
+    def get_queryset(self):
+        return Student.objects.order_by("-pk")
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["list_url"] = reverse("dashboard:students_list")
@@ -56,7 +59,7 @@ class StudentListView(StudentAccessMixin, ListView):
         query.pop("page", None)
         ctx["filter_qs"] = query.urlencode()
         ctx["has_filters"] = any(v for v in query.values())
-        ctx["rows"] = [_student_row(obj) for obj in self.object_list]
+        ctx["rows"] = [_student_row(obj) for obj in ctx["object_list"]]
         ctx["headers"] = [
             Student._meta.get_field(c).verbose_name.capitalize()
             for c in STUDENT_COLUMNS

@@ -122,10 +122,14 @@ def _user_list_filter(qs, request):
         year_scope = Student.objects.all()
         if not is_admin:
             year_scope = year_scope.filter(study_program_id=staff_sp) if staff_sp else year_scope.none()
-        years = sorted(
-            {"20" + n[4:6] for n in year_scope.values_list("student_id_number", flat=True) if len(n) >= 6},
-            reverse=True,
-        )
+        years = [
+            "20" + y["year"]
+            for y in year_scope.annotate(year=Substr("student_id_number", 5, 2))
+            .values("year")
+            .distinct()
+            .order_by("-year")
+            if y["year"]
+        ]
 
     ctx = {
         "tab": tab,
@@ -179,7 +183,9 @@ class UsersListView(UsersAccessMixin, ListView):
     template_name = "dashboard/users/list.html"
 
     def get_queryset(self):
-        qs = User.objects.order_by("-pk")
+        qs = User.objects.order_by("-pk").select_related(
+            "student__study_program", "staff__study_program"
+        )
         search = self.request.GET.get("search", "").strip()
         if search:
             cond = Q()
@@ -199,7 +205,7 @@ class UsersListView(UsersAccessMixin, ListView):
         query.pop("page", None)
         ctx["filter_qs"] = query.urlencode()
         ctx["has_filters"] = any(v for v in query.values())
-        ctx["rows"] = [_user_row(obj) for obj in self.object_list]
+        ctx["rows"] = [_user_row(obj) for obj in ctx["object_list"]]
         ctx["headers"] = [
             User._meta.get_field(c).verbose_name.capitalize()
             for c in USER_COLUMNS
@@ -455,7 +461,7 @@ def users_print(request):
         # Sama dengan search_fields di spec users: name, username, email.
         qs = qs.filter(Q(name__icontains=search) | Q(username__icontains=search) | Q(email__icontains=search))
     qs, extra = _user_list_filter(qs, request)
-    rows = qs.select_related("student__study_program")
+    rows = qs.select_related("student__study_program", "staff__study_program")
     return render(request, "dashboard/users/print.html", {
         "rows": rows,
         "search": search,

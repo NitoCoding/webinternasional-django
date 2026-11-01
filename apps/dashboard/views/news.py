@@ -97,7 +97,7 @@ class NewsListView(NewsAccessMixin, ListView):
         query.pop("page", None)
         ctx["filter_qs"] = query.urlencode()
         ctx["has_filters"] = any(v for v in query.values())
-        ctx["rows"] = [_news_row(obj) for obj in self.object_list]
+        ctx["rows"] = [_news_row(obj) for obj in ctx["object_list"]]
         ctx["headers"] = [
             News._meta.get_field(c).verbose_name.capitalize() for c in NEWS_COLUMNS
         ]

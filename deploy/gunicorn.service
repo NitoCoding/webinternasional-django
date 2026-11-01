@@ -1,0 +1,33 @@
+# Unit systemd untuk Django (International Office Unhas) dengan gunicorn.
+#
+# Deploy:
+#   1. cd /home/disk1/international && uv sync
+#   2. cp deploy/gunicorn.service /etc/systemd/system/icunhas.service
+#   3. systemctl daemon-reload && systemctl enable --now icunhas
+#
+# Sesuaikan User/Group, WorkingDirectory, path gunicorn, dan file env sesuai server.
+# File env (.env.prod) harus lengkap berisi semua kunci yang dibutuhkan
+# (SECRET_KEY, DEBUG, ALLOWED_HOSTS, DB_*, security flags, dan lainnya).
+[Unit]
+Description=Gunicorn untuk aplikasi Django (International Office Unhas)
+After=network.target
+
+[Service]
+Type=notify
+User=hendra
+Group=hendra
+WorkingDirectory=/home/disk1/international
+# Nilai dari .env.prod di-inject ke environment proses; karena django-environ
+# read_env(overwrite=False), nilai ini menang atas `.env` di root proyek.
+EnvironmentFile=/home/disk1/international/.env.prod
+# Bind 0.0.0.0 agar bisa diakses langsung lewat port 8030.
+# Setelah nginx + HTTPS terpasang, ganti menjadi 127.0.0.1:8030.
+ExecStart=/home/disk1/international/.venv/bin/gunicorn config.wsgi:application \
+    --workers 3 \
+    --timeout 120 \
+    --bind 0.0.0.0:8030
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

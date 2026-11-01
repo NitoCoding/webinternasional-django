@@ -36,6 +36,19 @@ uv run python manage.py runserver_plus
 
 Buka `http://127.0.0.1:8000/`.
 
+### Akses dari perangkat lain (debug di 0.0.0.0:8099)
+
+Untuk menguji dari laptop/perangkat lain lewat hostname atau IP server, jalankan server di semua interface:
+
+```bash
+uv run python manage.py runserver 0.0.0.0:8099
+```
+
+Lalu pastikan:
+- Hostname/IP yang dipakai terdaftar di `DJANGO_ALLOWED_HOSTS` di `.env` (dipisah koma), contoh: `DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,sipakamase.unhas.ac.id`.
+- Port 8099 terbuka di firewall server (`sudo ufw allow 8099/tcp`). Jika server ada di belakang router/cloud, port juga harus dibuka di sana.
+- Set `DJANGO_DEBUG=True` dulu saat debugging agar error tampil lengkap.
+
 ### Mode produksi (DEBUG=False)
 
 Static file dilayani oleh WhiteNoise dari folder `staticfiles/`. Setiap kali file di `static/` berubah, jalankan:
@@ -43,6 +56,58 @@ Static file dilayani oleh WhiteNoise dari folder `staticfiles/`. Setiap kali fil
 ```bash
 uv run python manage.py collectstatic --noinput
 ```
+
+## Deployment (produksi)
+
+### 1. Siapkan environment produksi
+
+```bash
+uv sync               # install dependensi (termasuk gunicorn)
+cp .env.example env.prod      # lalu ubah nilainya sesuai server
+```
+
+`env.prod` harus **lengkap**: `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=False`, `DJANGO_ALLOWED_HOSTS`, `DB_*`, `SIPAKAMASE_*`, dan flag keamanan (`SECURE_SSL_REDIRECT`, `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_HSTS_SECONDS`, `SECURE_PROXY_SSL_HEADER`). File env dipilih lewat variabel `DJANGO_ENV_FILE` (default: `.env` di root proyek).
+
+### 2. Migrasi dan static
+
+```bash
+uv run python manage.py migrate --noinput
+uv run python manage.py collectstatic --noinput
+```
+
+### 3. Jalankan dengan gunicorn (systemd)
+
+Contoh unit ada di `deploy/gunicorn.service`. Sesuaikan `WorkingDirectory`, `User`/`Group`, path `uv`, dan `DJANGO_ENV_FILE`, lalu:
+
+```bash
+sudo cp deploy/gunicorn.service /etc/systemd/system/<nama>.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now <nama>
+sudo journalctl -u <nama> -f
+```
+
+Setelah deploy kode baru: `sudo systemctl reload <nama>` (sinyal HUP, koneksi tidak putus).
+
+### 4. Reverse proxy nginx (HTTPS)
+
+Contoh konfigurasi ada di `deploy/nginx.cond` — salin ke `/etc/nginx/sites-available/`, sesuaikan `server_name` dan `proxy_pass`, lalu:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/<nama> /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Saat sudah lewat nginx: ubah bind gunicorn ke `127.0.0.1:8099` dan pastikan `SECURE_SSL_REDIRECT=True` (dkk.) aktif di `env.prod`.
+
+### 5. Backup terjadwal
+
+[`scripts/backup.py`](scripts/backup.py) meng-archive dump MySQL + `media/` + `private_media/` ke satu ZIP:
+
+```bash
+uv run python scripts/backup.py --keep 30
+```
+
+Jadwalkan via cron/systemd timer (contoh di docstring file) — untuk rutin sekali jalan seperti ini celery beat tidak diperlukan (tidak butuh broker Redis).
 
 ## Konfigurasi (.env)
 
